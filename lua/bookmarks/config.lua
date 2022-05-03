@@ -1,10 +1,15 @@
-local config = {}
+local config = {
+	data = nil
+}
 
 function config.setup()
 	config.data = {
 		keymap = {
 			add = "\\z",
-			list = "\\l",
+			toggle = "\\l",
+			jump = "<CR>",
+			delete = "\\dd",
+			order = "<space><space>"
 		}
 	}
 end
