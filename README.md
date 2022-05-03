@@ -1,0 +1,2 @@
+# bookmarks.nvim
+Another bookmarks
