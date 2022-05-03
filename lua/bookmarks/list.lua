@@ -41,14 +41,12 @@ function l.add(filename, line, description)
 			fre = 1
 		}
 	end
-	l.persistence()
 end
 
 function l.delete(line)
 	if l.order_ids[line] ~= nil then
 		l.data[l.order_ids[line]] = nil
 		l.refresh()
-		l.persistence()
 	end
 end
 
@@ -134,6 +132,7 @@ function l.jump()
 	local item = l.data[l.order_ids[line]]
 
 	l.data[l.order_ids[line]].fre = l.data[l.order_ids[line]].fre + 1
+	l.data[l.order_ids[line]].updated_at = os.time()
 
 	vim.api.nvim_set_current_win(w.bufw)
 	vim.cmd("e " .. item.filename)
@@ -144,26 +143,22 @@ function l.jump()
 	w.bufbw = nil
 end
 
-function l.load()
-	dofile()
-
+function l.load(data)
+	l.data[data.id] = data
 end
 
-function l.persistence()
+function l.persistent()
 	local tpl = [[
 require("bookmarks.list").load{
-	id = {
-		_
-	}
+	_
 }]]
 
 	local str = ""
 	for id, data in pairs(l.data) do
-		local tmp = string.gsub(tpl, "id", id)
 		local sub = ""
 		for k, v in pairs(data) do
 			if sub ~= "" then
-				sub = string.format("%s\n%s", sub, string.rep(" ", 8))
+				sub = string.format("%s\n%s", sub, string.rep(" ", 4))
 			end
 			if type(v) == "number" then
 				sub = sub .. string.format("%s = %s,", k, v)
@@ -171,17 +166,17 @@ require("bookmarks.list").load{
 				sub = sub .. string.format("%s = '%s',", k, v)
 			end
 		end
-
 		if str == "" then
-			str = string.format("%s%s", str, string.gsub(tmp, "_", sub))
+			str = string.format("%s%s", str, string.gsub(tpl, "_", sub))
 		else
-			str = string.format("%s\n%s", str, string.gsub(tmp, "_", sub))
+			str = string.format("%s\n%s", str, string.gsub(tpl, "_", sub))
 		end
 	end
 
 	local fd = assert(io.open(l.data_filename, "w"))
 	fd:write(str)
 	fd:close()
+	print("Persistent bookmarks finished")
 end
 
 function l.load_data()

@@ -29,10 +29,6 @@ function b.add_bookmarks()
 	l.add(filename,line,description)
 end
 
-function b.delete_bookmarks()
-
-end
-
 function b.toggle_bookmarks(order)
 	l.toggle()
 end

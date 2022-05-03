@@ -5,11 +5,11 @@ local config = {
 function config.setup()
 	config.data = {
 		keymap = {
+			toggle = "<tab><tab>",
 			add = "\\z",
-			toggle = "\\l",
 			jump = "<CR>",
 			delete = "\\dd",
-			order = "<space><space>"
+			order = "<space><space>",
 		}
 	}
 end
