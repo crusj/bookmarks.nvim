@@ -102,10 +102,10 @@ function l.flush()
 	l.order_ids = {}
 	for _, item in ipairs(tmp_data) do
 		local rep = math.floor(w.bw * 0.3)
+		local icon = (require 'nvim-web-devicons'.get_icon(item.filename)) or ""
 		lines[#lines + 1] = string.format("%s %s:%s [%s]",
 			l.padding(item.description, rep),
-			-- (require 'nvim-web-devicons'.get_icon(item.filename)) .. string.sub(item.filename, #cwd + 2),
-			(require 'nvim-web-devicons'.get_icon(item.filename)) .. item.filename,
+			icon.. item.filename,
 			item.line, item.fre)
 		l.order_ids[#l.order_ids + 1] = item.id
 	end

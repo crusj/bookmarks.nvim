@@ -5,7 +5,7 @@ local l = require("bookmarks.list")
 local w = require("bookmarks.window")
 
 function b.setup(user_config)
-	c.setup()
+	c.setup(user_config)
 	l.setup()
 	e.setup()
 	w.setup()

@@ -8,12 +8,14 @@ local w = {
 	bufw = nil,
 
 	previeww = nil,
+	hl_cursorline_name = "hl_bookmarks_csl"
 }
 
 local config = nil
 
 function w.setup()
 	config = require("bookmarks.config").get_data()
+	vim.cmd(string.format("highlight hl_bookmarks_csl %s", config.hl_cursorline))
 end
 
 function w.open_list_window()
@@ -22,9 +24,10 @@ function w.open_list_window()
 
 	if w.bufb == nil then
 		w.bufb = vim.api.nvim_create_buf(false, true)
-		vim.api.nvim_buf_set_keymap(w.bufb, "n", config.keymap.jump, ":lua require'bookmarks'.jump()<cr>", {silent = true})
-		vim.api.nvim_buf_set_keymap(w.bufb, "n", config.keymap.delete, ":lua require'bookmarks'.delete()<cr>", {silent = true})
-		vim.api.nvim_buf_set_keymap(w.bufb, "n", config.keymap.order, ":lua require'bookmarks.list'.refresh(true)<cr>", {silent = true})
+		vim.api.nvim_buf_set_option(w.bufb, 'filetype', 'bookmarks')
+		vim.api.nvim_buf_set_keymap(w.bufb, "n", config.keymap.jump, ":lua require'bookmarks'.jump()<cr>", { silent = true })
+		vim.api.nvim_buf_set_keymap(w.bufb, "n", config.keymap.delete, ":lua require'bookmarks'.delete()<cr>", { silent = true })
+		vim.api.nvim_buf_set_keymap(w.bufb, "n", config.keymap.order, ":lua require'bookmarks.list'.refresh(true)<cr>", { silent = true })
 	end
 
 	local cw = vim.api.nvim_win_get_width(0)
@@ -45,6 +48,7 @@ function w.open_list_window()
 	vim.api.nvim_win_set_option(w.bufbw, "relativenumber", false)
 	vim.api.nvim_win_set_option(w.bufbw, "scl", "no")
 	vim.api.nvim_win_set_option(w.bufbw, "cursorline", true)
+	vim.api.nvim_win_set_option(w.bufbw, "winhighlight", "CursorLine:"..w.hl_cursorline_name)
 
 	vim.api.nvim_win_set_buf(w.bufbw, w.bufb)
 end
