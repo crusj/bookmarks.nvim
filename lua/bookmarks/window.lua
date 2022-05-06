@@ -34,7 +34,7 @@ function w.open_list_window()
 	local eh = vim.api.nvim_get_option("lines")
 
 
-	w.bw = math.floor(ew * 0.5)
+	w.bw = math.floor(ew * 0.6)
 	w.bh = math.floor(eh * 0.7)
 	w.bufbw = vim.api.nvim_open_win(w.bufb, true, {
 		relative = "editor",
@@ -49,6 +49,7 @@ function w.open_list_window()
 	vim.api.nvim_win_set_option(w.bufbw, "relativenumber", false)
 	vim.api.nvim_win_set_option(w.bufbw, "scl", "no")
 	vim.api.nvim_win_set_option(w.bufbw, "cursorline", true)
+	vim.api.nvim_win_set_option(w.bufbw, "wrap", false)
 	vim.api.nvim_win_set_option(w.bufbw, "winhighlight", "CursorLine:"..w.hl_cursorline_name)
 
 	vim.api.nvim_win_set_buf(w.bufbw, w.bufb)
