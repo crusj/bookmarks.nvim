@@ -15,7 +15,7 @@ The storage data is lua code and load with ```dofile```:
 
 ```lua
 require("bookmarks.list").load{
-	filename = '/Users/crusj/Project/bookmarks.nvim/README.md',
+    filename = '/Users/crusj/Project/bookmarks.nvim/README.md',
     description = 'readme',
     fre = 3,
     id = '429b65925c650553dfcc8576231837a2',
@@ -23,7 +23,7 @@ require("bookmarks.list").load{
     updated_at = 1651588531,
 }
 require("bookmarks.list").load{
-	filename = '/Users/crusj/Project/bookmarks.nvim/lua/bookmarks/config.lua',
+    filename = '/Users/crusj/Project/bookmarks.nvim/lua/bookmarks/config.lua',
     description = 'keymap',
     fre = 11,
     id = 'a22afa41979db45c6a8215cb7df6304f',
@@ -31,7 +31,7 @@ require("bookmarks.list").load{
     updated_at = 1651588572,
 }
 require("bookmarks.list").load{
-	filename = '/Users/crusj/Project/bookmarks.nvim/lua/bookmarks/event.lua',
+    filename = '/Users/crusj/Project/bookmarks.nvim/lua/bookmarks/event.lua',
     description = 'add keymap',
     fre = 5,
     id = 'a2e79c4b86b533f43fe3aa5a545a5073',
