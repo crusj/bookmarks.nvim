@@ -30,17 +30,18 @@ function w.open_list_window()
 		vim.api.nvim_buf_set_keymap(w.bufb, "n", config.keymap.order, ":lua require'bookmarks.list'.refresh(true)<cr>", { silent = true })
 	end
 
-	local cw = vim.api.nvim_win_get_width(0)
-	local ch = vim.api.nvim_win_get_height(0)
+	local ew = vim.api.nvim_get_option("columns")
+	local eh = vim.api.nvim_get_option("lines")
 
-	w.bw = math.floor(cw * 0.75)
-	w.bh = math.floor(ch * 0.75)
+
+	w.bw = math.floor(ew * 0.5)
+	w.bh = math.floor(eh * 0.7)
 	w.bufbw = vim.api.nvim_open_win(w.bufb, true, {
-		relative = "win",
+		relative = "editor",
 		width = w.bw,
 		height = w.bh,
-		row = math.floor((ch - w.bh) / 2),
-		col = math.floor((cw - w.bw) / 2),
+		row = math.floor((eh - w.bh) / 2),
+		col = math.floor((ew - w.bw) / 2),
 		border = "double",
 	})
 
