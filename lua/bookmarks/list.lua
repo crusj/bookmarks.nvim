@@ -191,6 +191,10 @@ require("bookmarks.list").load{
 		end
 	end
 
+	if l.data_filename == nil then -- lazy load,
+		return
+	end
+
 	local fd = assert(io.open(l.data_filename, "w"))
 	fd:write(str)
 	fd:close()
