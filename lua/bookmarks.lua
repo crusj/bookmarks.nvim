@@ -29,7 +29,7 @@ function b.add_bookmarks()
 	l.add(filename,line,description)
 end
 
-function b.toggle_bookmarks(order)
+function b.toggle_bookmarks()
 	l.toggle()
 end
 

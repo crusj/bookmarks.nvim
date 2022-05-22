@@ -105,7 +105,7 @@ function l.flush()
 		local icon = (require 'nvim-web-devicons'.get_icon(item.filename)) or ""
 		lines[#lines + 1] = string.format("%s %s:%s [%s]",
 			l.padding(item.description, rep),
-			icon.. item.filename,
+			icon .. item.filename,
 			item.line, item.fre)
 		l.order_ids[#l.order_ids + 1] = item.id
 	end
@@ -134,13 +134,31 @@ function l.jump()
 	l.data[l.order_ids[line]].fre = l.data[l.order_ids[line]].fre + 1
 	l.data[l.order_ids[line]].updated_at = os.time()
 
-	vim.api.nvim_set_current_win(w.bufw)
-	vim.cmd("e " .. item.filename)
-	vim.cmd("execute  \"normal! " .. item.line .. "G;zz\"")
-	vim.cmd("execute  \"normal! zz\"")
+	local fn = function(cmd)
+		vim.cmd(cmd .. item.filename)
+		vim.cmd("execute  \"normal! " .. item.line .. "G;zz\"")
+		vim.cmd("execute  \"normal! zz\"")
+		vim.api.nvim_win_hide(w.bufbw)
+		w.bufbw = nil
+	end
 
-	vim.api.nvim_win_hide(w.bufbw)
-	w.bufbw = nil
+	local pre_buf_name = vim.api.nvim_buf_get_name(w.buff)
+	if vim.loop.fs_stat(pre_buf_name) then
+		vim.api.nvim_set_current_win(w.bufw)
+		fn("e ")
+
+		return
+	else
+		for _, id in pairs(vim.api.nvim_list_wins()) do
+			local buf = vim.api.nvim_win_get_buf(id)
+			if vim.loop.fs_stat(vim.api.nvim_buf_get_name(buf)) then
+				vim.api.nvim_set_current_win(id)
+				fn("e ")
+				return
+			end
+		end
+		fn("vs ")
+	end
 end
 
 function l.load(data)
