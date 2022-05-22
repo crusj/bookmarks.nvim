@@ -1,6 +1,5 @@
 # bookmarks.nvim
-Another bookmarks
-
+Remember file locations and sort by time and frequency.
 ## Description
 
 This plugin is used to mark any position of the file and jump to it. It can add notes when marking and persist the mark to the file when nvim exits for the next load. 
