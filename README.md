@@ -1,6 +1,5 @@
 # bookmarks.nvim
-Another bookmarks
-
+Remember file locations and sort by time and frequency.
 ## Description
 
 This plugin is used to mark any position of the file and jump to it. It can add notes when marking and persist the mark to the file when nvim exits for the next load. 
@@ -75,7 +74,7 @@ require("bookmarks").setup()
 ### Default config
 
 ```lua
-config.data = {
+require("bookmarks").setup({
 	keymap = {
 		toggle = "<tab><tab>", -- toggle bookmarks
 		add = "\\z", -- add bookmarks
@@ -84,5 +83,5 @@ config.data = {
 		order = "<space><space>", -- order bookmarks by frequency or updated_time
 	},
 	hl_cursorline = "guibg=Gray guifg=White" -- hl bookmarsk window cursorline
-}
+})
 ```
