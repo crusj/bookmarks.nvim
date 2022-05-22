@@ -74,7 +74,7 @@ require("bookmarks").setup()
 ### Default config
 
 ```lua
-require("buookmarks").setup({
+require("bookmarks").setup({
 	keymap = {
 		toggle = "<tab><tab>", -- toggle bookmarks
 		add = "\\z", -- add bookmarks
