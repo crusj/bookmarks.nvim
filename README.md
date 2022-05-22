@@ -74,7 +74,7 @@ require("bookmarks").setup()
 ### Default config
 
 ```lua
-config.data = {
+require("buookmarks").setup({
 	keymap = {
 		toggle = "<tab><tab>", -- toggle bookmarks
 		add = "\\z", -- add bookmarks
@@ -83,5 +83,5 @@ config.data = {
 		order = "<space><space>", -- order bookmarks by frequency or updated_time
 	},
 	hl_cursorline = "guibg=Gray guifg=White" -- hl bookmarsk window cursorline
-}
+})
 ```
