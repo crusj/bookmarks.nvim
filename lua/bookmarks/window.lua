@@ -22,7 +22,7 @@ function w.open_list_window()
 	w.buff = vim.api.nvim_get_current_buf()
 	w.bufw = vim.api.nvim_get_current_win()
 
-	if w.bufb == nil then
+	if w.bufb == nil or not vim.api.nvim_buf_is_valid(w.bufb) then
 		w.bufb = vim.api.nvim_create_buf(false, true)
 		vim.api.nvim_buf_set_option(w.bufb, 'filetype', 'bookmarks')
 		vim.api.nvim_buf_set_keymap(w.bufb, "n", config.keymap.jump, ":lua require'bookmarks'.jump()<cr>", { silent = true })
@@ -36,6 +36,8 @@ function w.open_list_window()
 
 	w.bw = math.floor(ew * 0.6)
 	w.bh = math.floor(eh * 0.7)
+
+
 	w.bufbw = vim.api.nvim_open_win(w.bufb, true, {
 		relative = "editor",
 		width = w.bw,

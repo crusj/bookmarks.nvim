@@ -10,7 +10,9 @@ local l = {
 	data_dir = nil,
 	data_filename = nil,
 
-	loaded_data = false
+	loaded_data = false,
+
+	cwd = nil,
 }
 
 function l.setup()
@@ -78,8 +80,6 @@ function l.toggle(order)
 end
 
 function l.flush()
-	l.load_data()
-
 	local tmp_data = {}
 	for _, item in pairs(l.data) do
 		tmp_data[#tmp_data + 1] = item
@@ -198,27 +198,36 @@ require("bookmarks.list").load{
 	local fd = assert(io.open(l.data_filename, "w"))
 	fd:write(str)
 	fd:close()
-	print("Persistent bookmarks finished")
+	-- print("Persistent bookmarks finished")
 end
 
 function l.load_data()
-	if l.loaded_data == false then
-		local cwd = string.gsub(vim.api.nvim_eval("getcwd()"), l.path_sep, "_")
-
-		l.data_dir = string.format("%s%sbookmarks", vim.fn.stdpath("data"), l.path_sep)
-		if not vim.loop.fs_stat(l.data_dir) then
-			assert(os.execute("mkdir " .. l.data_dir))
-		end
-
-		l.data_filename = string.format("%s%s%s", l.data_dir, l.path_sep, cwd)
-
-		if vim.loop.fs_stat(l.data_filename) then
-			dofile(l.data_filename)
-			print("load bookmarks finished..")
-		end
-
-		l.loaded_data = true
+	local cwd = string.gsub(vim.api.nvim_eval("getcwd()"), l.path_sep, "_")
+	if l.cwd ~= nil and cwd ~= l.cwd then -- maybe change session
+		l.persistent()
+		l.data = {}
+		l.loaded_data = false
 	end
+
+	if l.loaded_data == true then
+		return
+	end
+
+	local data_dir = string.format("%s%sbookmarks", vim.fn.stdpath("data"), l.path_sep)
+	if not vim.loop.fs_stat(data_dir) then
+		assert(os.execute("mkdir " .. data_dir))
+	end
+
+	local data_filename = string.format("%s%s%s", data_dir, l.path_sep, cwd)
+	if vim.loop.fs_stat(data_filename) then
+		dofile(data_filename)
+		-- print("load bookmarks finished..")
+	end
+
+	l.cwd = cwd
+	l.loaded_data = true
+	l.data_dir = data_dir
+	l.data_filename = data_filename
 end
 
 return l

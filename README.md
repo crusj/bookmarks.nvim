@@ -8,6 +8,8 @@ Each time you jump from a bookmark, the update time of the current bookmark will
 
 The data file is based on the **cwd** of each project for separate storage.
 
+Support switching between multiple sessions.
+
 The storage location is under```echo stdpath("data")```,mac is ```~/.local/share/nvim/bookmarks/```.
 
 The storage data is lua code and load with ```dofile```:
@@ -49,6 +51,8 @@ require("bookmarks.list").load{
 ## Install
 
 ### Requirment
+
+**Neovim >= 0.7**
 
 **File icon**
 
