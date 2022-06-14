@@ -10,7 +10,7 @@ The data file is based on the **cwd** of each project for separate storage.
 
 Support switching between multiple sessions.
 
-The storage location is under```echo stdpath("data")```,mac is ```~/.local/share/nvim/bookmarks/```.
+The storage location is under```echo stdpath("data")```, mac is ```~/.local/share/nvim/bookmarks/```.
 
 The storage data is lua code and load with ```dofile```:
 

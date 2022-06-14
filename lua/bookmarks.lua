@@ -26,7 +26,9 @@ function b.add_bookmarks()
 		end
 	end)
 
-	l.add(filename,line,description)
+	if description ~= "" then
+		l.add(filename,line,description)
+	end
 end
 
 function b.toggle_bookmarks()
