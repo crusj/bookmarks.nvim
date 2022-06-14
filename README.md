@@ -54,24 +54,21 @@ require("bookmarks.list").load{
 
 **Neovim >= 0.7**
 
-**File icon**
-
-```lua
-use 'kyazdani42/nvim-web-devicons'
-```
-### Install
-
 **packer**
 
 ```lua
-use 'crusj/bookmarks.nvim'
+{
+	'crusj/bookmarks.nvim',
+	branch = 'main',
+	requires = { 'kyazdani42/nvim-web-devicons' }
+}
 ```
 
+### Start
 ```lua
 require("bookmarks").setup()
 
 ```
-
 
 ## Usage
 
