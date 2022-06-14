@@ -18,7 +18,7 @@ function b.add_bookmarks()
 	local description = ""
 	--Description
 	vim.ui.input({
-		prompt = "Description:",
+		prompt = "Description: ",
 		default = "",
 	}, function(input)
 		if input ~= nil then

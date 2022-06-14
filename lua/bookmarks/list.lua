@@ -64,8 +64,7 @@ function l.refresh(order)
 	l.flush()
 end
 
-function l.toggle(order)
-	-- close
+function l.toggle()
 	if w.bufbw ~= nil and vim.api.nvim_win_is_valid(w.bufbw) then
 		vim.api.nvim_win_hide(w.bufbw)
 		w.bufbw = nil
@@ -96,8 +95,6 @@ function l.flush()
 	end
 
 	local lines = {}
-	-- local cwd = vim.api.nvim_eval("getcwd()")
-
 
 	l.order_ids = {}
 	for _, item in ipairs(tmp_data) do
@@ -120,10 +117,11 @@ function l.flush()
 end
 
 function l.padding(str, len)
-	if #str > len then
+	local tmp = l.characters(str,2)
+	if tmp > len then
 		return string.sub(str, 0, len)
 	else
-		return str .. string.rep(" ", len - #str)
+		return str .. string.rep(" ", len - tmp)
 	end
 end
 
@@ -198,7 +196,6 @@ require("bookmarks.list").load{
 	local fd = assert(io.open(l.data_filename, "w"))
 	fd:write(str)
 	fd:close()
-	-- print("Persistent bookmarks finished")
 end
 
 function l.load_data()
@@ -221,7 +218,6 @@ function l.load_data()
 	local data_filename = string.format("%s%s%s", data_dir, l.path_sep, cwd)
 	if vim.loop.fs_stat(data_filename) then
 		dofile(data_filename)
-		-- print("load bookmarks finished..")
 	end
 
 	l.cwd = cwd
@@ -229,5 +225,27 @@ function l.load_data()
 	l.data_dir = data_dir
 	l.data_filename = data_filename
 end
+
+function l.characters(utf8Str, aChineseCharBytes)
+    aChineseCharBytes = aChineseCharBytes or 2
+    local i = 1
+    local characterSum = 0
+    while (i <= #utf8Str) do      -- 编码的关系
+        local bytes4Character = l.bytes4Character(string.byte(utf8Str, i))
+        characterSum = characterSum + (bytes4Character > aChineseCharBytes and aChineseCharBytes or bytes4Character)
+        i = i + bytes4Character
+    end
+
+    return characterSum
+end
+
+function l.bytes4Character(theByte)
+    local seperate = {0, 0xc0, 0xe0, 0xf0}
+    for i = #seperate, 1, -1 do
+        if theByte >= seperate[i] then return i end
+    end
+    return 1
+end
+
 
 return l
