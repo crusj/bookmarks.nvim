@@ -34,8 +34,8 @@ function w.open_list_window()
 	local eh = vim.api.nvim_get_option("lines")
 
 
-	w.bw = math.floor(ew * 0.6)
-	w.bh = math.floor(eh * 0.7)
+	w.bw = math.floor(ew * config.width)
+	w.bh = math.floor(eh * config.height)
 
 
 	w.bufbw = vim.api.nvim_open_win(w.bufb, true, {
