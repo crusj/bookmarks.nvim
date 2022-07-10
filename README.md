@@ -83,8 +83,9 @@ require("bookmarks").setup({
 		delete = "dd", -- delete bookmarks
 		order = "<space><space>", -- order bookmarks by frequency or updated_time
 	},
-	width = 0.6, -- bookmarks window width:  (0, 1]
-	height = 0.6, -- bookmarks window height: (0, 1]
-	hl_cursorline = "guibg=Gray guifg=White" -- hl bookmarsk window cursorline
+	width = 0.8, -- bookmarks window width:  (0, 1]
+    height = 0.6, -- bookmarks window height: (0, 1]
+    preview_ratio = 0.4, -- bookmarks preview window ratio (0.1]
+    hl_cursorline = "guibg=Gray guifg=White" -- hl bookmarsk window cursorline
 })
 ```
