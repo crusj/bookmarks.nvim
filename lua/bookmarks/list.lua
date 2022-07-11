@@ -47,7 +47,7 @@ end
 
 function l.delete(line)
     if l.order_ids[line] ~= nil then
-        l.data[l.order_ids[line]] = nil
+        l.data[ l.order_ids[line] ] = nil
         l.refresh()
     end
 end
@@ -63,7 +63,6 @@ function l.refresh(order)
 
     l.flush()
 end
-
 
 function l.flush()
     local tmp_data = {}
@@ -81,16 +80,19 @@ function l.flush()
         end)
     end
 
-    local lines = {}
-
     l.order_ids = {}
+    local lines = {}
     for _, item in ipairs(tmp_data) do
-        local rep = math.floor(w.bw * 0.3)
+        local s = item.filename:split("/")
+        local rep = math.floor(w.bw * 0.4)
         local icon = (require 'nvim-web-devicons'.get_icon(item.filename)) or ""
-        lines[#lines + 1] = string.format("%s %s:%s [%s]",
-            l.padding(item.description, rep),
-            icon .. item.filename,
-            item.line, item.fre)
+
+        local tmp = item.fre
+        if l.order == "time" then
+            tmp = os.date("%Y-%m-%d %H:%M:%S",item.updated_at)
+        end
+
+        lines[#lines + 1] = string.format("%s %s [%s]", l.padding(item.description, rep), icon .. " " .. s[#s], tmp)
         l.order_ids[#l.order_ids + 1] = item.id
     end
 
@@ -101,8 +103,6 @@ function l.flush()
     -- flush
     vim.api.nvim_buf_set_lines(w.bufb, 0, #lines, false, lines)
     vim.api.nvim_buf_set_option(w.bufb, "modifiable", false)
-
-    return tmp_data
 end
 
 function l.padding(str, len)
@@ -115,10 +115,10 @@ function l.padding(str, len)
 end
 
 function l.jump(line)
-    local item = l.data[l.order_ids[line]]
+    local item = l.data[ l.order_ids[line] ]
 
-    l.data[l.order_ids[line]].fre = l.data[l.order_ids[line]].fre + 1
-    l.data[l.order_ids[line]].updated_at = os.time()
+    l.data[ l.order_ids[line] ].fre = l.data[ l.order_ids[line] ].fre + 1
+    l.data[ l.order_ids[line] ].updated_at = os.time()
 
     local fn = function(cmd)
         vim.cmd(cmd .. item.filename)

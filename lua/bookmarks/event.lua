@@ -33,8 +33,10 @@ function e.create_autocmd_cursorMoved()
                     local item = l.data[l.order_ids[line]]
                     if item ~= nil then
                         w.open_preview(item.filename, item.line)
+                        w.open_detail_window(item)
                     else
                         w.open_preview(nil)
+                        w.open_detail_window(nil)
                     end
                 end
             end
