@@ -97,12 +97,7 @@ function w.open_preview(filename, lineNumber)
                 vim.api.nvim_buf_set_option(w.bufp, "modifiable", true)
                 vim.api.nvim_buf_set_lines(w.bufp, 0, -1, false, {})
                 vim.api.nvim_buf_set_lines(w.bufp, 0, #lines, false, lines)
-
-                vim.api.nvim_set_current_win(w.previeww)
-                vim.fn.execute("normal " .. lineNumber .. "G")
-                vim.fn.execute("normal zz")
-                vim.api.nvim_set_current_win(w.bufbw)
-
+                vim.api.nvim_win_set_cursor(w.previeww, { lineNumber, 0 })
                 vim.api.nvim_buf_set_option(w.bufp, "modifiable", false)
             end
         end
