@@ -84,15 +84,19 @@ function l.flush()
     local lines = {}
     for _, item in ipairs(tmp_data) do
         local s = item.filename:split("/")
-        local rep = math.floor(w.bw * 0.4)
+        local rep1 = math.floor(w.bw * 0.3)
+        local rep2 = math.floor(w.bw * 0.5)
+
+
         local icon = (require 'nvim-web-devicons'.get_icon(item.filename)) or ""
 
         local tmp = item.fre
         if l.order == "time" then
             tmp = os.date("%Y-%m-%d %H:%M:%S",item.updated_at)
+            rep2 = math.floor(w.bw * 0.4)
         end
 
-        lines[#lines + 1] = string.format("%s %s [%s]", l.padding(item.description, rep), icon .. " " .. s[#s], tmp)
+        lines[#lines + 1] = string.format("%s %s [%s]", l.padding(item.description, rep1), l.padding(icon .. " " .. s[#s],rep2), tmp)
         l.order_ids[#l.order_ids + 1] = item.id
     end
 
