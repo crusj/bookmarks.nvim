@@ -89,3 +89,6 @@ require("bookmarks").setup({
         hl_cursorline = "guibg=Gray guifg=White" -- hl bookmarsk window cursorline
 })
 ```
+## TODO
+
+- [ ] Categorize
