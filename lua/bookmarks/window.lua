@@ -93,10 +93,14 @@ function w.open_preview(filename, lineNumber)
             if vim.api.nvim_buf_is_valid(w.bufp) then
                 w.filename = filename
                 w.lineNumber = lineNumber
-
                 vim.api.nvim_buf_set_option(w.bufp, "modifiable", true)
                 vim.api.nvim_buf_set_lines(w.bufp, 0, -1, false, {})
                 vim.api.nvim_buf_set_lines(w.bufp, 0, #lines, false, lines)
+                if config.preview_ext_enable then
+                    local cuts = filename:split(".")
+                    local ext = cuts[#cuts]
+                    vim.api.nvim_buf_set_option(w.bufp, "filetype", ext)
+                end
                 vim.api.nvim_win_set_cursor(w.previeww, { lineNumber, 0 })
                 vim.api.nvim_buf_set_option(w.bufp, "modifiable", false)
             end
