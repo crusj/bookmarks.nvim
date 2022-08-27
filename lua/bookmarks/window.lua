@@ -97,7 +97,7 @@ function w.open_preview(filename, lineNumber)
                 vim.api.nvim_buf_set_lines(w.bufp, 0, -1, false, {})
                 vim.api.nvim_buf_set_lines(w.bufp, 0, #lines, false, lines)
                 if config.preview_ext_enable then
-                    local cuts = filename:split(".")
+                    local cuts = filename:split_b(".")
                     local ext = cuts[#cuts]
                     vim.api.nvim_buf_set_option(w.bufp, "filetype", ext)
                 end

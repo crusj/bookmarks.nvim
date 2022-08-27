@@ -83,7 +83,7 @@ function l.flush()
     l.order_ids = {}
     local lines = {}
     for _, item in ipairs(tmp_data) do
-        local s = item.filename:split("/")
+        local s = item.filename:split_b("/")
         local rep1 = math.floor(w.bw * 0.3)
         local rep2 = math.floor(w.bw * 0.5)
 
