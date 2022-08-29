@@ -52,7 +52,7 @@ require("bookmarks.list").load{
 
 ### Requirment
 
-**Neovim >= 0.7**
+* **Neovim >= 0.7**
 
 **packer**
 
@@ -92,5 +92,5 @@ require("bookmarks").setup({
 })
 ```
 ## TODO
-- [ ] Fix bookmarks when file changed
+- [ ] Fix bookmarks when file changed(branch dev)
 - [ ] Categorize
