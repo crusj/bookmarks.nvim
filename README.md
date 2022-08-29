@@ -92,5 +92,5 @@ require("bookmarks").setup({
 })
 ```
 ## TODO
-
+- [ ] Fix bookmarks when file changed
 - [ ] Categorize
