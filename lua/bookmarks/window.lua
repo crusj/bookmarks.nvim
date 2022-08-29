@@ -1,3 +1,5 @@
+local helper = require("bookmarks.helper")
+
 local w = {
     bufb = nil,
     bufbw = nil,
@@ -75,6 +77,10 @@ function w.open_preview(filename, lineNumber)
         w.bufp = vim.api.nvim_create_buf(false, true)
         vim.api.nvim_buf_set_option(w.bufp, 'filetype', 'bookmarks_preview')
     end
+    
+    -- clear
+    vim.api.nvim_buf_set_option(w.bufp, "modifiable", true)
+    vim.api.nvim_buf_set_lines(w.bufp, 0, -1, false, {})
 
     w.create_preview_w()
 
@@ -82,31 +88,21 @@ function w.open_preview(filename, lineNumber)
         return
     end
 
-    local lines = {}
-    vim.fn.jobstart("cat " .. filename, {
-        on_stdout = function(_, data)
-            for _, line in pairs(data) do
-                lines[#lines + 1] = line
-            end
-        end,
-        on_exit = function()
-            if vim.api.nvim_buf_is_valid(w.bufp) then
-                w.filename = filename
-                w.lineNumber = lineNumber
-                vim.api.nvim_buf_set_option(w.bufp, "modifiable", true)
-                vim.api.nvim_buf_set_lines(w.bufp, 0, -1, false, {})
-                vim.api.nvim_buf_set_lines(w.bufp, 0, #lines, false, lines)
-                if config.preview_ext_enable then
-                    local cuts = filename:split_b(".")
-                    local ext = cuts[#cuts]
-                    vim.api.nvim_buf_set_option(w.bufp, "filetype", ext)
-                end
-                vim.api.nvim_win_set_cursor(w.previeww, { lineNumber, 0 })
-                vim.api.nvim_buf_set_option(w.bufp, "modifiable", false)
-            end
+    local lines = helper.read_all_file(filename)
+    if vim.api.nvim_buf_is_valid(w.bufp) then
+        w.filename = filename
+        w.lineNumber = lineNumber
+        vim.api.nvim_buf_set_lines(w.bufp, 0, -1, false, {})
+        vim.api.nvim_buf_set_lines(w.bufp, 0, #lines, false, lines)
+        if config.preview_ext_enable then
+            local cuts = filename:split_b(".")
+            local ext = cuts[#cuts]
+            vim.api.nvim_buf_set_option(w.bufp, "filetype", ext)
         end
-    })
+        vim.api.nvim_win_set_cursor(w.previeww, { lineNumber, 0 })
+    end
 
+    vim.api.nvim_buf_set_option(w.bufp, "modifiable", false)
 end
 
 function w.create_preview_w()

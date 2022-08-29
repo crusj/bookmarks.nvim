@@ -21,6 +21,15 @@ function e.autocmd()
         callback = l.persistent
     })
 
+    vim.fn.jobstart({ "lua", "require('bookmarks.list').load_data()" })
+    vim.api.nvim_create_autocmd({ "BufWritePost" }, {
+        callback = function()
+            local start = os.clock()
+            require("bookmarks.fix").fix_bookmarks()
+            print(os.clock() - start)
+        end
+    })
+
 end
 
 function e.create_autocmd_cursorMoved()
