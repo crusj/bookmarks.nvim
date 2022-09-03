@@ -4,7 +4,7 @@ local e = {
 local config = nil
 local l = require("bookmarks.list")
 local w = require("bookmarks.window")
-local notify = require("notify")
+-- local notify = require("notify")
 
 function e.setup()
     config = require("bookmarks.config").get_data()
@@ -23,17 +23,18 @@ function e.autocmd()
     })
 
     vim.fn.jobstart({ "lua", "require('bookmarks.list').load_data()" })
-    vim.api.nvim_create_autocmd({ "BufWritePost" }, {
-        callback = function()
-            local start = os.clock()
-            require("bookmarks.fix").fix_bookmarks()
-            local spend = tostring(os.clock() - start)
-            notify.notify(spend, vim.log.levels.WARN, {
-                title = "spend",
-            })
-        end
-    })
-
+    if config.fix_enable then
+        vim.api.nvim_create_autocmd({ "BufWritePost" }, {
+            callback = function()
+                -- local start = os.clock()
+                require("bookmarks.fix").fix_bookmarks()
+                -- local spend = tostring(os.clock() - start)
+                -- notify.notify(spend, vim.log.levels.WARN, {
+                --     title = "spend",
+                -- })
+            end
+        })
+    end
 end
 
 function e.create_autocmd_cursorMoved()
