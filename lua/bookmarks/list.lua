@@ -2,7 +2,9 @@ local md5 = require("bookmarks.md5")
 local w = require("bookmarks.window")
 
 local l = {
-    data = {},
+    data = {}, -- filename description fre id line updated_at line_md5
+    filename_group = {}, -- group bookmarks by filename
+
     order_ids = {},
     order = "time",
     is_windows = false,
@@ -23,9 +25,8 @@ function l.setup()
     end
 end
 
-function l.add(filename, line, description)
-    l.load_data()
-
+-- rows is the file line number of rows
+function l.add(filename, line, line_md5, description, rows)
     local id = md5.sumhexa(string.format("%s:%s", filename, line))
     local now = os.time()
     if l.data[id] ~= nil then --update description
@@ -40,18 +41,27 @@ function l.add(filename, line, description)
             line = line,
             description = description or "",
             updated_at = now,
-            fre = 1
+            fre = 1,
+            rows = rows, -- for fix
+            line_md5 = line_md5, -- for fix
         }
+        if l.filename_group[filename] == nil then
+            l.filename_group[filename] = {id}
+        else
+            l.filename_group[filename][#l.filename_group[filename]+1] = id
+        end
     end
 end
 
+-- delete bookmark
 function l.delete(line)
     if l.order_ids[line] ~= nil then
-        l.data[ l.order_ids[line] ] = nil
+        l.data[l.order_ids[line]] = nil
         l.refresh()
     end
 end
 
+-- mark bookmarks order by time or fre
 function l.refresh(order)
     if order == true then
         if l.order == "time" then
@@ -63,13 +73,15 @@ function l.refresh(order)
 
     l.flush()
 end
-
+-- flush bookmarks to float window
 function l.flush()
+    -- for order
     local tmp_data = {}
     for _, item in pairs(l.data) do
         tmp_data[#tmp_data + 1] = item
     end
 
+    -- sort by order mark
     if l.order == "time" then
         table.sort(tmp_data, function(e1, e2)
             return e1.updated_at > e2.updated_at
@@ -87,28 +99,28 @@ function l.flush()
         local rep1 = math.floor(w.bw * 0.3)
         local rep2 = math.floor(w.bw * 0.5)
 
-
         local icon = (require 'nvim-web-devicons'.get_icon(item.filename)) or ""
 
         local tmp = item.fre
         if l.order == "time" then
-            tmp = os.date("%Y-%m-%d %H:%M:%S",item.updated_at)
+            tmp = os.date("%Y-%m-%d %H:%M:%S", item.updated_at)
             rep2 = math.floor(w.bw * 0.4)
         end
 
-        lines[#lines + 1] = string.format("%s %s [%s]", l.padding(item.description, rep1), l.padding(icon .. " " .. s[#s],rep2), tmp)
+        lines[#lines + 1] = string.format("%s %s [%s]", l.padding(item.description, rep1),
+            l.padding(icon .. " " .. s[#s], rep2), tmp)
         l.order_ids[#l.order_ids + 1] = item.id
     end
 
     vim.api.nvim_buf_set_option(w.bufb, "modifiable", true)
     -- empty
     vim.api.nvim_buf_set_lines(w.bufb, 0, -1, false, {})
-
     -- flush
     vim.api.nvim_buf_set_lines(w.bufb, 0, #lines, false, lines)
     vim.api.nvim_buf_set_option(w.bufb, "modifiable", false)
 end
 
+-- align bookmarks display
 function l.padding(str, len)
     local tmp = l.characters(str, 2)
     if tmp > len then
@@ -118,11 +130,12 @@ function l.padding(str, len)
     end
 end
 
+-- jump
 function l.jump(line)
-    local item = l.data[ l.order_ids[line] ]
+    local item = l.data[l.order_ids[line]]
 
-    l.data[ l.order_ids[line] ].fre = l.data[ l.order_ids[line] ].fre + 1
-    l.data[ l.order_ids[line] ].updated_at = os.time()
+    l.data[l.order_ids[line]].fre = l.data[l.order_ids[line]].fre + 1
+    l.data[l.order_ids[line]].updated_at = os.time()
 
     local fn = function(cmd)
         vim.cmd(cmd .. item.filename)
@@ -149,10 +162,7 @@ function l.jump(line)
     end
 end
 
-function l.load(data)
-    l.data[data.id] = data
-end
-
+-- write bookmarks into disk file for next load
 function l.persistent()
     local tpl = [[
 require("bookmarks.list").load{
@@ -188,6 +198,7 @@ require("bookmarks.list").load{
     fd:close()
 end
 
+-- restore bookmarks from disk file
 function l.load_data()
     local cwd = string.gsub(vim.api.nvim_eval("getcwd()"), l.path_sep, "_")
     if l.cwd ~= nil and cwd ~= l.cwd then -- maybe change session
@@ -211,11 +222,22 @@ function l.load_data()
     end
 
     l.cwd = cwd
-    l.loaded_data = true
+    l.loaded_data = true -- mark
     l.data_dir = data_dir
     l.data_filename = data_filename
 end
 
+-- dofile
+function l.load(data)
+    l.data[data.id] = data
+
+    if l.filename_group[data.filename] == nil then
+        l.filename_group[data.filename] = {} 
+    end
+    l.filename_group[data.filename][#l.filename_group[data.filename] + 1] = data.id
+end
+
+-- fix bookmarks alignment
 function l.characters(utf8Str, aChineseCharBytes)
     aChineseCharBytes = aChineseCharBytes or 2
     local i = 1

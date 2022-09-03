@@ -1,0 +1,78 @@
+local l = require("bookmarks.list")
+local helper = require("bookmarks.helper")
+local md5 = require("bookmarks.md5")
+
+local function fix_bookmarks()
+    local rows = vim.fn.line("$")
+    local filename = vim.api.nvim_buf_get_name(0)
+
+    -- find bookmarks
+    if l.filename_group[filename] == nil then
+        return
+    end
+
+    for _, id in pairs(l.filename_group[filename]) do
+        local b = l.data[id]
+        if b == nil then
+            return
+        end
+
+        if b.line > rows then
+            b.line = rows
+        end
+
+        local text = vim.api.nvim_buf_get_lines(0, b.line - 1, b.line, true)[1]
+        if text == nil then
+            goto continue
+        end
+
+
+        -- not change
+        if md5.sumhexa(text) == b.line_md5 then
+            goto continue
+        end
+
+        local changed_rows = math.abs(rows - b.rows)
+        if changed_rows == 0 then -- try fix
+            changed_rows = 5
+        end
+
+        -- up search
+        local up_line = b.line
+        for i = 1, changed_rows do
+            up_line = up_line - 1
+            if up_line < 0 then
+                break
+            end
+
+            local text = vim.api.nvim_buf_get_lines(0, up_line - 1, up_line, true)[1]
+            if text ~= nil and md5.sumhexa(text) == b.line_md5 then
+                l.data[id].line = up_line
+                l.data[id].rows = rows
+                goto continue
+            end
+        end
+
+        -- down search
+        local down_line = b.line
+        for i = 1, changed_rows do
+            down_line = down_line + 1
+            if down_line > rows then
+                break
+            end
+
+            local text = vim.api.nvim_buf_get_lines(0, down_line - 1, down_line, true)[1]
+            if text ~= nil and md5.sumhexa(text) == b.line_md5 then
+                l.data[id].line = down_line
+                l.data[id].rows = rows
+                goto continue
+            end
+        end
+
+        ::continue::
+    end
+end
+
+return {
+    fix_bookmarks = fix_bookmarks
+}

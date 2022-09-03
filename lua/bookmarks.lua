@@ -3,6 +3,7 @@ local c = require("bookmarks.config")
 local e = require("bookmarks.event")
 local l = require("bookmarks.list")
 local w = require("bookmarks.window")
+local md5 = require("bookmarks.md5")
 require("bookmarks.split")
 
 function b.setup(user_config)
@@ -12,13 +13,10 @@ function b.setup(user_config)
     w.setup()
 end
 
--- add bookmarks
+-- add bookmark
 function b.add_bookmarks()
-    local filename = vim.api.nvim_buf_get_name(0)
-    local line = vim.api.nvim_eval("line('.')")
-
     local description = ""
-    --Description
+    -- get description, default empty string
     vim.ui.input({
         prompt = "Description: ",
         default = "",
@@ -28,8 +26,11 @@ function b.add_bookmarks()
         end
     end)
 
+    local line = vim.fn.line('.')
+    -- add bookmark only description is not empty
     if description ~= "" then
-        l.add(filename, line, description)
+        l.add(vim.api.nvim_buf_get_name(0), line, md5.sumhexa(vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]),
+            description, vim.fn.line("$"))
     end
 end
 

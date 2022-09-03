@@ -1,4 +1,5 @@
 local helper = require("bookmarks.helper")
+
 local w = {
     bufb = nil,
     bufbw = nil,
@@ -76,6 +77,10 @@ function w.open_preview(filename, lineNumber)
         w.bufp = vim.api.nvim_create_buf(false, true)
         vim.api.nvim_buf_set_option(w.bufp, 'filetype', 'bookmarks_preview')
     end
+    
+    -- clear
+    vim.api.nvim_buf_set_option(w.bufp, "modifiable", true)
+    vim.api.nvim_buf_set_lines(w.bufp, 0, -1, false, {})
 
     -- clear
     vim.api.nvim_buf_set_option(w.bufp, "modifiable", true)
@@ -98,13 +103,15 @@ function w.open_preview(filename, lineNumber)
             local ext = cuts[#cuts]
             vim.api.nvim_buf_set_option(w.bufp, "filetype", ext)
         end
-
-        local currentW = vim.api.nvim_get_current_win()
+        local cw = vim.api.nvim_get_current_win()
         vim.api.nvim_win_set_cursor(w.previeww, { lineNumber, 0 })
         vim.api.nvim_set_current_win(w.previeww)
-        vim.fn.execute("normal zz")
-        vim.api.nvim_set_current_win(currentW)
+        vim.fn.execute("normal! zz")
+        vim.api.nvim_set_current_win(cw)
+
     end
+
+    vim.api.nvim_buf_set_option(w.bufp, "modifiable", false)
 end
 
 function w.create_preview_w()
