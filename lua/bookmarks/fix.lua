@@ -1,18 +1,19 @@
-local l = require("bookmarks.list")
 local helper = require("bookmarks.helper")
 local md5 = require("bookmarks.md5")
+local data = require("bookmarks.data")
+local api = vim.api
 
 local function fix_bookmarks()
     local rows = vim.fn.line("$")
-    local filename = vim.api.nvim_buf_get_name(0)
+    local filename = api.nvim_buf_get_name(0)
 
     -- find bookmarks
-    if l.filename_group[filename] == nil then
+    if data.bookmarks_groupby_filename[filename] == nil then
         return
     end
 
-    for _, id in pairs(l.filename_group[filename]) do
-        local b = l.data[id]
+    for _, id in pairs(data.bookmarks_groupby_filename[filename]) do
+        local b = data.bookmarks[id]
         if b == nil then
             return
         end
@@ -21,7 +22,7 @@ local function fix_bookmarks()
             b.line = rows
         end
 
-        local text = vim.api.nvim_buf_get_lines(0, b.line - 1, b.line, true)[1]
+        local text = api.nvim_buf_get_lines(0, b.line - 1, b.line, true)[1]
         if text == nil then
             goto continue
         end
@@ -30,6 +31,10 @@ local function fix_bookmarks()
         -- not change
         if md5.sumhexa(text) == b.line_md5 then
             goto continue
+        end
+
+        if b.rows == nil then
+            b.rows = rows
         end
 
         local changed_rows = math.abs(rows - b.rows)
@@ -45,10 +50,10 @@ local function fix_bookmarks()
                 break
             end
 
-            local text = vim.api.nvim_buf_get_lines(0, up_line - 1, up_line, true)[1]
+            local text = api.nvim_buf_get_lines(0, up_line - 1, up_line, true)[1]
             if text ~= nil and md5.sumhexa(text) == b.line_md5 then
-                l.data[id].line = up_line
-                l.data[id].rows = rows
+                data.bookmarks[id].line = up_line
+                data.bookmarks[id].rows = rows
                 goto continue
             end
         end
@@ -61,10 +66,10 @@ local function fix_bookmarks()
                 break
             end
 
-            local text = vim.api.nvim_buf_get_lines(0, down_line - 1, down_line, true)[1]
+            local text = api.nvim_buf_get_lines(0, down_line - 1, down_line, true)[1]
             if text ~= nil and md5.sumhexa(text) == b.line_md5 then
-                l.data[id].line = down_line
-                l.data[id].rows = rows
+                data.bookmarks[id].line = down_line
+                data.bookmarks[id].rows = rows
                 goto continue
             end
         end

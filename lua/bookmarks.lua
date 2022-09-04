@@ -4,7 +4,9 @@ local e = require("bookmarks.event")
 local l = require("bookmarks.list")
 local w = require("bookmarks.window")
 local md5 = require("bookmarks.md5")
+local data = require("bookmarks.data")
 require("bookmarks.split")
+
 
 function b.setup(user_config)
     c.setup(user_config)
@@ -36,35 +38,21 @@ end
 
 -- open or close bookmarks window
 function b.toggle_bookmarks()
-    if w.bufbw ~= nil and vim.api.nvim_win_is_valid(w.bufbw) then
-        -- close bookmarks
-        w.close_bw()
-
-        -- close preview window
-        w.close_previeww()
-        -- close detail window
-        w.close_detail_window()
-        -- delete autocmd
-        e.delete_autocmd_cursorMoved()
-
+    if data.bufbw ~= nil and vim.api.nvim_win_is_valid(data.bufbw) then
+        w.close_bookmarks()
         return
     end
 
     -- open bookmarks
-    e.create_autocmd_cursorMoved()
     l.load_data()
-    w.open_list_window()
+    w.open_bookmarks()
     l.flush()
 end
 
 -- jump to file from bookmarks
 function b.jump()
     l.jump(vim.fn.line("."))
-
-    w.close_bw()
-    w.close_previeww()
-    w.close_detail_window()
-    e.delete_autocmd_cursorMoved()
+    w.close_bookmarks()
 
 end
 
