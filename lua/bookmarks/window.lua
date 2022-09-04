@@ -1,204 +1,159 @@
 local helper = require("bookmarks.helper")
+local float = require("bookmarks.float")
+local data = require("bookmarks.data")
+local api = vim.api
 
-local w = {
-    bufb = nil,
-    bufbw = nil,
-    bw = 0, -- bookmarks window width
-    bh = 0, -- bookmarks window height
-
-    buff = nil,
-    bufw = nil,
-
-    bufp = nil, -- preview buffer
-    previeww = nil, -- preview window
-    autocmd = 0, -- cursormoved autocmd id
-    filename = "", -- current bookmarks filename
-    lineNumber = 0, -- current bookmarks line number
-
-    bufd = nil, -- detail buffer
-    detailw = nil, -- detail window
-
-    hl_cursorline_name = "hl_bookmarks_csl",
-}
+local M = {}
 
 local config = nil
 
-function w.setup()
+function M.setup()
     config = require("bookmarks.config").get_data()
     vim.cmd(string.format("highlight hl_bookmarks_csl %s", config.hl_cursorline))
 end
 
-function w.open_list_window()
-    w.buff = vim.api.nvim_get_current_buf()
-    w.bufw = vim.api.nvim_get_current_win()
+local function bookmarks_autocmd(buffer)
+    data.event1 = api.nvim_create_autocmd({ "CursorMoved" }, {
+        callback = function()
+            local line = api.nvim_eval("line('.')")
+            local item = data.bookmarks[data.bookmarks_order_ids[line]] or {}
 
-    if w.bufb == nil or not vim.api.nvim_buf_is_valid(w.bufb) then
-        w.bufb = vim.api.nvim_create_buf(false, true)
-        vim.api.nvim_buf_set_option(w.bufb, 'filetype', 'bookmarks')
-        vim.api.nvim_buf_set_keymap(w.bufb, "n", config.keymap.jump, ":lua require'bookmarks'.jump()<cr>",
-            { silent = true })
-        vim.api.nvim_buf_set_keymap(w.bufb, "n", config.keymap.delete, ":lua require'bookmarks'.delete()<cr>",
-            { silent = true })
-        vim.api.nvim_buf_set_keymap(w.bufb, "n", config.keymap.order, ":lua require'bookmarks.list'.refresh(true)<cr>",
-            { silent = true })
-    end
+            M.preview_bookmark(item.filename, item.line)
+        end,
+        buffer = buffer,
+    })
+end
 
-    local ew = vim.api.nvim_get_option("columns")
-    local eh = vim.api.nvim_get_option("lines")
+function M.open_bookmarks()
+    data.buff = api.nvim_get_current_buf()
+    data.bufw = api.nvim_get_current_win()
+
+    local ew = api.nvim_get_option("columns")
+    local eh = api.nvim_get_option("lines")
 
 
     local width = math.floor(ew * config.width)
     local height = math.floor(eh * config.height)
 
-    w.bw = math.floor(width * (1 - config.preview_ratio))
-    w.bh = height - 3
+    data.bw = math.floor(width * (1 - config.preview_ratio))
+    data.bh = height
 
-    w.bufbw = vim.api.nvim_open_win(w.bufb, true, {
-        relative = "editor",
-        width = w.bw,
-        height = w.bh,
+    local options = {
+        width = data.bw,
+        height = data.bh,
+        title = "Bookmarks",
+        row = math.floor((eh - height) / 2),
         col = math.floor((ew - width) / 2),
-        row = math.floor((eh - height) / 2 + 3),
-        border = "rounded",
-    })
+        relative = "editor"
+    }
 
-    vim.api.nvim_win_set_option(w.bufbw, "number", false)
-    vim.api.nvim_win_set_option(w.bufbw, "scl", "no")
-    vim.api.nvim_win_set_option(w.bufbw, "cursorline", true)
-    vim.api.nvim_win_set_option(w.bufbw, "wrap", false)
-    vim.api.nvim_win_set_option(w.bufbw, "winhighlight", "CursorLine:" .. w.hl_cursorline_name)
+    local pair = float.create_win(options)
+    data.bufb = pair.buf
+    data.bufbw = pair.win
 
-    vim.api.nvim_win_set_buf(w.bufbw, w.bufb)
+    data.bufbb = float.create_border(options).buf
+
+    api.nvim_buf_set_option(data.bufb, 'filetype', 'bookmarks')
+    api.nvim_buf_set_keymap(data.bufb, "n", config.keymap.jump, ":lua require'bookmarks'.jump()<cr>",
+        { silent = true })
+    api.nvim_buf_set_keymap(data.bufb, "n", config.keymap.delete, ":lua require'bookmarks'.delete()<cr>",
+        { silent = true })
+    api.nvim_buf_set_keymap(data.bufb, "n", config.keymap.order, ":lua require'bookmarks.list'.refresh(true)<cr>",
+        { silent = true })
+
+    api.nvim_win_set_option(data.bufbw, "cursorline", true)
+    api.nvim_win_set_option(data.bufbw, "wrap", false)
+    api.nvim_win_set_option(data.bufbw, "winhighlight", "CursorLine:" .. data.hl_cursorline_name)
+    api.nvim_set_current_win(data.bufbw)
+
+    bookmarks_autocmd(data.bufb)
+end
+
+function M.close_bookmarks()
+    api.nvim_del_autocmd(data.event1)
+    vim.cmd(string.format("bwipeout! %s", data.bufb))
+    vim.cmd(string.format("bwipeout! %s", data.bufbb))
+    M.close_preview()
+    M.close_preview_border()
 end
 
 -- open preview window
-function w.open_preview(filename, lineNumber)
-    if w.bufp == nil or (not vim.api.nvim_buf_is_valid(w.bufp)) then
-        w.bufp = vim.api.nvim_create_buf(false, true)
-        vim.api.nvim_buf_set_option(w.bufp, 'filetype', 'bookmarks_preview')
-    end
-    
-    -- clear
-    vim.api.nvim_buf_set_option(w.bufp, "modifiable", true)
-    vim.api.nvim_buf_set_lines(w.bufp, 0, -1, false, {})
+function M.preview_bookmark(filename, lineNumber)
+    local ew = api.nvim_get_option("columns")
+    local eh = api.nvim_get_option("lines")
 
-    -- clear
-    vim.api.nvim_buf_set_option(w.bufp, "modifiable", true)
-    vim.api.nvim_buf_set_lines(w.bufp, 0, -1, false, {})
+    local width = math.floor(ew * config.width)
+    local height = math.floor(eh * config.height)
+    local pw = math.floor(ew * config.width - data.bw)
 
-    w.create_preview_w()
-
-    if filename == nil or (filename == w.filename and lineNumber == w.lineNumber) then
-        return
+    local title = "Nothing to preview"
+    if filename ~= nil then
+        local common_len = helper.get_str_common_len(vim.fn.getcwd(), filename)
+        title = string.sub(filename, common_len + 1)
     end
 
-    local lines = helper.read_all_file(filename)
-    if vim.api.nvim_buf_is_valid(w.bufp) then
-        w.filename = filename
-        w.lineNumber = lineNumber
-        vim.api.nvim_buf_set_lines(w.bufp, 0, -1, false, {})
-        vim.api.nvim_buf_set_lines(w.bufp, 0, #lines, false, lines)
+    local options = {
+        width = pw,
+        height = height,
+        title = title,
+        row = math.floor((eh - height) / 2 + height - data.bh),
+        col = math.floor((ew - width) / 2 + data.bw + 2),
+        relative = "editor"
+    }
+
+    if data.bufp == nil then
+        local pair = float.create_win(options)
+        data.bufp = pair.buf
+        data.bufpw = pair.win
+
+        local border_pair = float.create_border(options)
+        data.bufbp = border_pair.buf
+        data.bufbpw = border_pair.win
+    end
+
+
+    api.nvim_buf_set_lines(data.bufbp, 0, 1, false, { float.createTopLine(options.title, options.width) })
+
+    if filename ~= nil then
+        local lines = helper.read_all_file(filename)
+        data.filename = filename
+        data.lineNumber = lineNumber
+        api.nvim_buf_set_option(data.bufp, "modifiable", true)
+        api.nvim_buf_set_lines(data.bufp, 0, -1, false, {})
+        api.nvim_buf_set_lines(data.bufp, 0, #lines, false, lines)
         if config.preview_ext_enable then
             local cuts = filename:split_b(".")
             local ext = cuts[#cuts]
-            vim.api.nvim_buf_set_option(w.bufp, "filetype", ext)
+            api.nvim_buf_set_option(data.bufp, "filetype", ext)
         end
-        local cw = vim.api.nvim_get_current_win()
-        vim.api.nvim_win_set_cursor(w.previeww, { lineNumber, 0 })
-        vim.api.nvim_set_current_win(w.previeww)
+
+        local cw = api.nvim_get_current_win()
+
+        api.nvim_win_set_cursor(data.bufpw, { lineNumber, 0 })
+        api.nvim_win_set_option(data.bufpw, "cursorline", true)
+        api.nvim_win_set_option(data.bufpw, "number", true)
+        api.nvim_set_current_win(data.bufpw)
         vim.fn.execute("normal! zz")
-        vim.api.nvim_set_current_win(cw)
 
-    end
+        api.nvim_set_current_win(cw)
 
-    vim.api.nvim_buf_set_option(w.bufp, "modifiable", false)
-end
-
-function w.create_preview_w()
-    local ew = vim.api.nvim_get_option("columns")
-    local eh = vim.api.nvim_get_option("lines")
-
-    local width = math.floor(ew * config.width)
-    local height = math.floor(eh * config.height)
-    local pw = math.floor(ew * config.width - w.bw)
-
-    if w.previeww == nil or (not vim.api.nvim_win_is_valid(w.previeww)) then
-        w.previeww = vim.api.nvim_open_win(w.bufp, false, {
-            relative = "editor",
-            width = pw,
-            height = height - 3,
-            col = math.floor((ew - width) / 2 + w.bw + 2),
-            row = math.floor((eh - height) / 2 + height - w.bh),
-            border = "rounded",
-            noautocmd = true,
-        })
-    end
-    vim.api.nvim_win_set_option(w.previeww, "number", true)
-end
-
-function w.close_previeww()
-    if w.previeww ~= nil and vim.api.nvim_win_is_valid(w.previeww) then
-        vim.api.nvim_win_hide(w.previeww)
-        w.previeww = nil
-        w.filename = ""
-        w.lineNumber = ""
+        api.nvim_buf_set_option(data.bufp, "modifiable", false)
     end
 end
 
-function w.close_bw()
-    vim.api.nvim_win_hide(w.bufbw)
-    w.bufbw = nil
+function M.close_preview()
+    vim.cmd(string.format("bwipeout! %s", data.bufp))
+    M.close_preview_border()
+    data.bufp = nil
 end
 
--- detail window shows message and bookmarks position info
-function w.open_detail_window(item)
-    if w.bufd == nil or (not vim.api.nvim_buf_is_valid(w.bufd)) then
-        w.bufd = vim.api.nvim_create_buf(false, true)
-        vim.api.nvim_buf_set_option(w.bufd, 'filetype', 'bookmarks_detail')
+function M.close_preview_border()
+    if data.bufbp == nil then
+        return
     end
 
-    w.create_detail_w()
-
-    if item ~= nil then
-        local lines = {
-            "Description: " .. item.description,
-            "Filename: " .. item.filename .. ":" .. item.line,
-            "Updated_at: " .. os.date("%Y-%m-%d %H:%M:%S", item.updated_at) .. " Fre: " .. item.fre,
-        }
-
-        vim.api.nvim_buf_set_option(w.bufd, "modifiable", true)
-        vim.api.nvim_buf_set_lines(w.bufd, 0, -1, false, {})
-        vim.api.nvim_buf_set_lines(w.bufd, 0, #lines, false, lines)
-        vim.api.nvim_buf_set_option(w.bufd, "modifiable", false)
-    end
+    vim.cmd(string.format("bwipeout! %s", data.bufbp))
+    data.bufbp = nil
 end
 
-function w.create_detail_w()
-    local ew = vim.api.nvim_get_option("columns")
-    local eh = vim.api.nvim_get_option("lines")
-
-    local width = math.floor(ew * config.width)
-    local height = math.floor(eh * config.height)
-    if w.detailw == nil or (not vim.api.nvim_win_is_valid(w.detailw)) then
-        w.detailw = vim.api.nvim_open_win(w.bufd, false, {
-            relative = "editor",
-            width = width + 2,
-            height = 3,
-            col = math.floor((ew - width) / 2),
-            row = math.floor((eh - height) / 2 - 1.5),
-            border = "rounded",
-            noautocmd = true,
-        })
-    end
-    vim.api.nvim_win_set_option(w.detailw, "number", false)
-    vim.api.nvim_win_set_option(w.detailw, 'cursorline', false)
-end
-
-function w.close_detail_window()
-    if w.detailw ~= nil and vim.api.nvim_win_is_valid(w.detailw) then
-        vim.api.nvim_win_hide(w.detailw)
-        w.detailw = nil
-    end
-end
-
-return w
+return M

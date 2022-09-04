@@ -1,9 +1,9 @@
-local config = {
+local M = {
 	data = nil
 }
 
-function config.setup(user_config)
-	config.data = {
+function M.setup(user_config)
+	M.data = {
 		keymap = {
 			toggle = "<tab><tab>", -- toggle bookmarks
 			add = "\\z", -- add bookmarks
@@ -23,23 +23,23 @@ function config.setup(user_config)
 		return
 	end
 
-	for dk, dv in pairs(config.data) do
+	for dk, dv in pairs(M.data) do
 		if type(dv) ~= "table" then
 			if user_config[dk] ~= nil then
-				config.data[dk] = user_config[dk]
+				M.data[dk] = user_config[dk]
 			end
 		else
 			for fk, fv in pairs(dv) do
 				if user_config[dk] ~= nil and user_config[dk][fk] ~= nil then
-					config.data[dk][fk] = user_config[dk][fk]
+					M.data[dk][fk] = user_config[dk][fk]
 				end
 			end
 		end
 	end
 end
 
-function config.get_data()
-	return config.data
+function M.get_data()
+	return M.data
 end
 
-return config
+return M
