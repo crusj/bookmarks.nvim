@@ -36,7 +36,7 @@ local M = {
 
     hl_cursorline_name = "hl_bookmarks_csl",
 
-    event1 = nil
+    event1 = nil,
 }
 
 return M

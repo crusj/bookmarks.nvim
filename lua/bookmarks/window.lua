@@ -156,4 +156,33 @@ function M.close_preview_border()
     data.bufbp = nil
 end
 
+function M.open_add_win(line)
+    local ew = api.nvim_get_option("columns")
+    local eh = api.nvim_get_option("lines")
+    local width, height = 100, 1
+    local options = {
+        width = width,
+        height = height,
+        title = "Input description",
+        row = math.floor((eh - height) / 2),
+        col = math.floor((ew - width) / 2),
+        relative = "editor"
+    }
+
+    local pairs = float.create_win(options)
+    local border_pairs = float.create_border(options)
+    api.nvim_set_current_win(pairs.win)
+    vim.cmd("startinsert")
+
+    return {
+        pairs = pairs,
+        border_pairs = border_pairs
+    }
+end
+
+function M.close_add_win(buf1, buf2)
+    vim.cmd(string.format("bwipeout! %s", buf1))
+    vim.cmd(string.format("bwipeout! %s", buf2))
+end
+
 return M

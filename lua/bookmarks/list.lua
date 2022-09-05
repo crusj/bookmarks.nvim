@@ -13,6 +13,32 @@ function M.setup()
     end
 end
 
+function M.add_bookmark(line, content, filename, rows)
+    local bufs_pairs = w.open_add_win(line)
+    api.nvim_buf_set_keymap(bufs_pairs.pairs.buf, "n", "<ESC>",
+        string.format(":lua require('bookmarks.window').close_add_win(%s,%s)<cr>", bufs_pairs.pairs.buf,
+            bufs_pairs.border_pairs.buf),
+        { silent = true })
+
+    api.nvim_buf_set_keymap(bufs_pairs.pairs.buf, "i", "<CR>",
+        string.format("<esc><cmd>lua require('bookmarks.list').handle_add(%s, %s, %s,'%s','%s')<cr>",
+            line,
+            bufs_pairs.pairs.buf,
+            bufs_pairs.border_pairs.buf,
+            content, filename, rows),
+        { silent = true, noremap = true })
+end
+
+function M.handle_add(line, buf1, buf2, content, filename, rows)
+    local input_line = vim.fn.line(".")
+    local description = api.nvim_buf_get_lines(buf1, input_line - 1, input_line, false)[1] or ""
+    if description ~= "" then
+        M.add(filename, line, md5.sumhexa(content),
+            description, rows)
+    end
+    w.close_add_win(buf1, buf2)
+end
+
 -- rows is the file line number of rows
 function M.add(filename, line, line_md5, description, rows)
     local id = md5.sumhexa(string.format("%s:%s", filename, line))
@@ -136,7 +162,7 @@ function M.jump(line)
     if vim.loop.fs_stat(pre_buf_name) then
         api.nvim_set_current_win(data.bufw)
         fn("e ")
-
+        goto continue
         return
     else
         for _, id in pairs(api.nvim_list_wins()) do
@@ -144,11 +170,15 @@ function M.jump(line)
             if vim.loop.fs_stat(api.nvim_buf_get_name(buf)) then
                 api.nvim_set_current_win(id)
                 fn("e ")
+                goto continue
                 return
             end
         end
         fn("vs ")
     end
+
+    ::continue::
+    w.close_bookmarks()
 end
 
 -- write bookmarks into disk file for next load

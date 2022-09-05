@@ -17,23 +17,9 @@ end
 
 -- add bookmark
 function b.add_bookmarks()
-    local description = ""
-    -- get description, default empty string
-    vim.ui.input({
-        prompt = "Description: ",
-        default = "",
-    }, function(input)
-        if input ~= nil then
-            description = input
-        end
-    end)
-
     local line = vim.fn.line('.')
-    -- add bookmark only description is not empty
-    if description ~= "" then
-        l.add(vim.api.nvim_buf_get_name(0), line, md5.sumhexa(vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]),
-            description, vim.fn.line("$"))
-    end
+    l.add_bookmark(line, vim.api.nvim_buf_get_lines(0, line - 1, line, false)[1], vim.api.nvim_buf_get_name(0),
+        vim.fn.line("$"))
 end
 
 -- open or close bookmarks window
@@ -52,14 +38,11 @@ end
 -- jump to file from bookmarks
 function b.jump()
     l.jump(vim.fn.line("."))
-    w.close_bookmarks()
-
 end
 
 -- delete bookmarks
 function b.delete()
-    local line = vim.api.nvim_eval("line('.')")
-    l.delete(line)
+    l.delete(vim.fn.line('.'))
 end
 
 return b
