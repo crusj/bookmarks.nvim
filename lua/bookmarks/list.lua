@@ -16,16 +16,19 @@ end
 function M.add_bookmark(line, content, filename, rows)
     local bufs_pairs = w.open_add_win(line)
     api.nvim_buf_set_keymap(bufs_pairs.pairs.buf, "n", "<ESC>",
-        string.format(":lua require('bookmarks.window').close_add_win(%s,%s)<cr>", bufs_pairs.pairs.buf,
+        string.format(":lua require('bookmarks.window').close_add_win(%d, %d)<cr>", bufs_pairs.pairs.buf,
             bufs_pairs.border_pairs.buf),
         { silent = true })
 
     api.nvim_buf_set_keymap(bufs_pairs.pairs.buf, "i", "<CR>",
-        string.format("<esc><cmd>lua require('bookmarks.list').handle_add(%s, %s, %s,'%s','%s')<cr>",
+        string.format("<esc><cmd>lua require('bookmarks.list').handle_add(%d, %d, %d, [[%s]], [[%s]], %d)<cr>",
             line,
             bufs_pairs.pairs.buf,
             bufs_pairs.border_pairs.buf,
-            content, filename, rows),
+            content,
+            filename,
+            rows
+        ),
         { silent = true, noremap = true })
 end
 
