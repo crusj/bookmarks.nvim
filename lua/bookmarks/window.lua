@@ -71,10 +71,14 @@ end
 
 function M.close_bookmarks()
     api.nvim_del_autocmd(data.event1)
+
     vim.cmd(string.format("bwipeout! %s", data.bufb))
+    if api.nvim_win_is_valid(data.bufbw) then
+        api.nvim_win_close(data.bufbw, true)
+    end
     vim.cmd(string.format("bwipeout! %s", data.bufbb))
+
     M.close_preview()
-    M.close_preview_border()
 end
 
 -- open preview window
