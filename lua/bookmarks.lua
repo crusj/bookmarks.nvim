@@ -26,10 +26,14 @@ end
 -- open or close bookmarks window
 function M.toggle_bookmarks()
     if data.bufbw ~= nil and vim.api.nvim_win_is_valid(data.bufbw) then
+        if vim.api.nvim_win_is_valid(data.last_win) then
+            vim.api.nvim_set_current_win(data.last_win)
+        end
         w.close_bookmarks()
         return
     end
 
+    data.last_win = vim.api.nvim_get_current_win()
     -- open bookmarks
     l.load_data()
     w.open_bookmarks()
