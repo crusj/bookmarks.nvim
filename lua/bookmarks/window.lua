@@ -64,6 +64,7 @@ function M.open_bookmarks()
     api.nvim_win_set_option(data.bufbw, "cursorline", true)
     api.nvim_win_set_option(data.bufbw, "wrap", false)
     api.nvim_win_set_option(data.bufbw, "winhighlight", "CursorLine:" .. data.hl_cursorline_name)
+    api.nvim_win_set_option(data.bufbw, "winhighlight", 'Normal:normal')
     api.nvim_set_current_win(data.bufbw)
 
     bookmarks_autocmd(data.bufb)
@@ -136,6 +137,8 @@ function M.preview_bookmark(filename, lineNumber)
         api.nvim_win_set_cursor(data.bufpw, { lineNumber, 0 })
         api.nvim_win_set_option(data.bufpw, "cursorline", true)
         api.nvim_win_set_option(data.bufpw, "number", true)
+        api.nvim_win_set_option(data.bufpw, "winhighlight", 'Normal:normal')
+
         api.nvim_set_current_win(data.bufpw)
         vim.fn.execute("normal! zz")
 
@@ -176,6 +179,7 @@ function M.open_add_win(line)
     local pairs = float.create_win(options)
     local border_pairs = float.create_border(options)
     api.nvim_set_current_win(pairs.win)
+    api.nvim_win_set_option(pairs.win, 'winhighlight', 'Normal:normal')
     vim.cmd("startinsert")
 
     return {
