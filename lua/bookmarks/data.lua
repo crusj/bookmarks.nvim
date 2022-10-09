@@ -39,6 +39,7 @@ local M = {
     event1 = nil,
 
     last_win = nil,
+    last_buf = nil,
 }
 
 return M

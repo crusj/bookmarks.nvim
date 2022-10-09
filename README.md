@@ -10,6 +10,8 @@ The data file is based on the **cwd** of each project for separate storage.
 
 Support switching between multiple sessions.
 
+Show virt text at the end of bookmarked lines.
+
 The storage location is under```echo stdpath("data")```, mac is ```~/.local/share/nvim/bookmarks/```.
 
 The storage data is lua code and load with ```dofile```:
@@ -77,19 +79,21 @@ require("bookmarks").setup()
 ```lua
 require("bookmarks").setup({
 	keymap = {
-		toggle = "<tab><tab>", -- toggle bookmarks
-		add = "\\z", -- add bookmarks
-		jump = "<CR>", -- jump from bookmarks
-		delete = "dd", -- delete bookmarks
-		order = "<space><space>", -- order bookmarks by frequency or updated_time
+		toggle = "<tab><tab>", -- Toggle bookmarks
+		add = "\\z", -- Add bookmarks
+		jump = "<CR>", -- Jump from bookmarks
+		delete = "dd", -- Delete bookmarks
+		order = "<space><space>", -- Order bookmarks by frequency or updated_time
 	},
-    width = 0.8, -- bookmarks window width:  (0, 1]
-    height = 0.6, -- bookmarks window height: (0, 1]
-    preview_ratio = 0.4, -- bookmarks preview window ratio (0, 1]
-    preview_ext_enable = false, -- if true, preview buf will add file ext, preview window may be highlighed(treesitter), but may be slower.
-    fix_enable = false, -- if true, when saving the current file, if the bookmark line number of the current file changes, try to fix it.
+    width = 0.8, -- Bookmarks window width:  (0, 1]
+    height = 0.6, -- Bookmarks window height: (0, 1]
+    preview_ratio = 0.4, -- Bookmarks preview window ratio (0, 1]
+    preview_ext_enable = false, -- If true, preview buf will add file ext, preview window may be highlighed(treesitter), but may be slower.
+    fix_enable = false, -- If true, when saving the current file, if the bookmark line number of the current file changes, try to fix it.
     hl_cursorline = "guibg=Gray guifg=White" -- hl bookmarsk window cursorline.
     
+    virt_text = "💫" , -- Show virt text at the end of bookmarked lines
+    virt_pattern = { "*.go", "*.lua", "*.sh", "*.php", "*.rust" } -- Show virt text only on matched pattern
 })
 ```
 ## TODO

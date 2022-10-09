@@ -1,9 +1,11 @@
 local config = nil
 local l = require("bookmarks.list")
 local w = require("bookmarks.window")
+local m = require("bookmarks.marks")
 -- local notify = require("notify")
 
 local M = {}
+local api = vim.api
 
 function M.setup()
     config = require("bookmarks.config").get_data()
@@ -17,23 +19,28 @@ function M.key_bind()
 end
 
 function M.autocmd()
-    vim.api.nvim_create_autocmd({ "VimLeave" }, {
+    api.nvim_create_autocmd({ "VimLeave" }, {
         callback = l.persistent
     })
 
-    vim.fn.jobstart({ "lua", "require('bookmarks.list').load_data()" })
-    if config.fix_enable then
-        vim.api.nvim_create_autocmd({ "BufWritePost" }, {
-            callback = function()
-                -- local start = os.clock()
+    require('bookmarks.list').load_data()
+    api.nvim_create_autocmd({ "BufWritePost" }, {
+        callback = function()
+            if config.fix_enable then
                 require("bookmarks.fix").fix_bookmarks()
-                -- local spend = tostring(os.clock() - start)
-                -- notify.notify(spend, vim.log.levels.WARN, {
-                --     title = "spend",
-                -- })
             end
-        })
-    end
+            local buf = api.nvim_get_current_buf()
+            m.set_marks(buf, l.get_buf_bookmark_lines(buf))
+        end
+    })
+
+    api.nvim_create_autocmd({ "BufWinEnter" }, {
+        pattern = config.virt_pattern,
+        callback = function()
+            local buf = api.nvim_get_current_buf()
+            m.set_marks(buf, l.get_buf_bookmark_lines(buf))
+        end
+    })
 end
 
 return M

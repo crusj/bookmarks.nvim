@@ -1,6 +1,7 @@
 local md5 = require("bookmarks.md5")
 local w = require("bookmarks.window")
 local data = require("bookmarks.data")
+local m = require("bookmarks.marks")
 local api = vim.api
 
 local M = {}
@@ -11,6 +12,7 @@ function M.setup()
     if data.is_windows then
         data.path_sep = "\\"
     end
+    M.load_data()
 end
 
 function M.add_bookmark(line, content, filename, rows)
@@ -40,6 +42,7 @@ function M.handle_add(line, buf1, buf2, content, filename, rows)
             description, rows)
     end
     w.close_add_win(buf1, buf2)
+    m.set_marks(0, M.get_buf_bookmark_lines(0))
 end
 
 -- rows is the file line number of rows
@@ -69,6 +72,24 @@ function M.add(filename, line, line_md5, description, rows)
             data.bookmarks_groupby_filename[filename][#data.bookmarks_groupby_filename[filename] + 1] = id
         end
     end
+end
+
+function M.get_buf_bookmark_lines(buf)
+    local filename = api.nvim_buf_get_name(buf)
+    local lines = {}
+
+    local group = data.bookmarks_groupby_filename[filename]
+    if group == nil then
+        return lines
+    end
+
+    for _, each in pairs(group) do
+        if data.bookmarks[each] ~= nil then
+            lines[#lines + 1] = data.bookmarks[each].line
+        end
+    end
+
+    return lines
 end
 
 -- delete bookmark
