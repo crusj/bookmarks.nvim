@@ -84,6 +84,7 @@ require("bookmarks").setup({
 		jump = "<CR>", -- Jump from bookmarks
 		delete = "dd", -- Delete bookmarks
 		order = "<space><space>", -- Order bookmarks by frequency or updated_time
+		delete_on_virt = "\\dd", -- Delete bookmark at virt text line 
 	},
     width = 0.8, -- Bookmarks window width:  (0, 1]
     height = 0.6, -- Bookmarks window height: (0, 1]

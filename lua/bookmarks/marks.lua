@@ -5,19 +5,8 @@ local M = {
 }
 
 function M.set_marks(buf, lines)
-    -- local F = function()
-    --     M.async_set_marks(buf, lines)
-    -- end
-    --
-    -- print(type(F))
-    -- vim.fn.timer_start(0, 'F')
-    M.async_set_marks(buf,lines)
-end
-
-function M.async_set_marks(buf, lines)
+    local file_name = vim.api.nvim_buf_get_name(buf)
     local pattern = require("bookmarks.config").data.virt_pattern
-    local file_name = api.nvim_buf_get_name(buf)
-
     local cuts = file_name:split_b(".")
     local t = cuts[#cuts]
     local is_match = false

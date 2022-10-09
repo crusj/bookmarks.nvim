@@ -83,9 +83,11 @@ function M.get_buf_bookmark_lines(buf)
         return lines
     end
 
+    local tmp = {}
     for _, each in pairs(group) do
-        if data.bookmarks[each] ~= nil then
+        if data.bookmarks[each] ~= nil and tmp[data.bookmarks[each].line] == nil then
             lines[#lines + 1] = data.bookmarks[each].line
+            tmp[data.bookmarks[each].line] = true
         end
     end
 
@@ -97,6 +99,18 @@ function M.delete(line)
     if data.bookmarks_order_ids[line] ~= nil then
         data.bookmarks[data.bookmarks_order_ids[line]] = nil
         M.refresh()
+    end
+end
+
+function M.delete_on_virt()
+    local line = vim.fn.line(".")
+    local file_name = api.nvim_buf_get_name(0)
+    for k, v in pairs(data.bookmarks) do
+        if v.line == line and file_name == v.filename then
+            data.bookmarks[k] = nil
+            m.set_marks(0, M.get_buf_bookmark_lines(0))
+            return
+        end
     end
 end
 
