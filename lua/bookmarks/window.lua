@@ -22,6 +22,24 @@ local function bookmarks_autocmd(buffer)
         end,
         buffer = buffer,
     })
+
+    data.event2 = api.nvim_create_autocmd({ "WinClosed" }, {
+        callback = function()
+            M.close_bookmarks()
+        end,
+        buffer = buffer,
+    })
+end
+
+local function bookmarks_preview_autocmd(buffer)
+    data.event3 = api.nvim_create_autocmd({ "WinClosed" }, {
+        callback = function()
+            if data.bufb ~= nil and api.nvim_buf_is_valid(data.bufb) then
+                M.close_bookmarks()
+            end
+        end,
+        buffer = buffer,
+    })
 end
 
 function M.open_bookmarks()
@@ -71,13 +89,25 @@ function M.open_bookmarks()
 end
 
 function M.close_bookmarks()
+    -- delete CursorMoved event
     api.nvim_del_autocmd(data.event1)
+    -- delete BufWinLeave event
+    api.nvim_del_autocmd(data.event2)
 
-    vim.cmd(string.format("bwipeout! %s", data.bufb))
+    if api.nvim_buf_is_valid(data.bufb) then
+        api.nvim_buf_delete(data.bufb, {})
+        data.bufb = nil
+    end
+
     if api.nvim_win_is_valid(data.bufbw) then
         api.nvim_win_close(data.bufbw, true)
+        data.bufbw = nil
     end
-    vim.cmd(string.format("bwipeout! %s", data.bufbb))
+
+    if api.nvim_buf_is_valid(data.bufbb) then
+        vim.cmd(string.format("bwipeout! %d", data.bufbb))
+        data.bufbb = nil
+    end
 
     M.close_preview()
 end
@@ -110,6 +140,7 @@ function M.preview_bookmark(filename, lineNumber)
         local pair = float.create_win(options)
         data.bufp = pair.buf
         data.bufpw = pair.win
+        bookmarks_preview_autocmd(data.bufp)
 
         local border_pair = float.create_border(options)
         data.bufbp = border_pair.buf
@@ -149,8 +180,15 @@ function M.preview_bookmark(filename, lineNumber)
 end
 
 function M.close_preview()
-    vim.cmd(string.format("bwipeout! %s", data.bufp))
-    M.close_preview_border()
+    if data.bufp == nil then
+        return
+    end
+
+    if api.nvim_buf_is_valid(data.bufp) then
+        api.nvim_buf_delete(data.bufp,{})
+        M.close_preview_border()
+    end
+
     data.bufp = nil
 end
 
@@ -159,7 +197,10 @@ function M.close_preview_border()
         return
     end
 
-    vim.cmd(string.format("bwipeout! %s", data.bufbp))
+    if api.nvim_buf_is_valid(data.bufbp) then
+        vim.cmd(string.format("bwipeout! %d", data.bufbp))
+    end
+
     data.bufbp = nil
 end
 
@@ -189,8 +230,8 @@ function M.open_add_win(line)
 end
 
 function M.close_add_win(buf1, buf2)
-    vim.cmd(string.format("bwipeout! %s", buf1))
-    vim.cmd(string.format("bwipeout! %s", buf2))
+    vim.cmd(string.format("bwipeout! %d", buf1))
+    vim.cmd(string.format("bwipeout! %d", buf2))
 end
 
 return M
