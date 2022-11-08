@@ -17,6 +17,7 @@ function M.key_bind()
     vim.keymap.set("n", config.keymap.add, ":lua require'bookmarks'.add_bookmarks()<cr>", { silent = true })
     vim.keymap.set("n", config.keymap.toggle, ":lua require'bookmarks'.toggle_bookmarks()<cr>", { silent = true })
     vim.keymap.set("n", config.keymap.delete_on_virt, ":lua require'bookmarks.list'.delete_on_virt()<cr>", { silent = true })
+    vim.keymap.set("n", config.keymap.show_desc, ":lua require'bookmarks.list'.show_desc()<cr>", { silent = true })
 end
 
 function M.autocmd()

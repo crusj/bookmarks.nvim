@@ -4,7 +4,7 @@ local M = {
     marks = {},
 }
 
-function M.set_marks(buf, lines)
+function M.set_marks(buf, marks)
     local file_name = vim.api.nvim_buf_get_name(buf)
     local pattern = require("bookmarks.config").data.virt_pattern
     local cuts = file_name:split_b(".")
@@ -34,8 +34,8 @@ function M.set_marks(buf, lines)
     end
 
     -- set new old ext
-    for _, line in ipairs(lines) do
-        local ext_id = api.nvim_buf_set_extmark(buf, M.ns_id, line - 1, -1, {
+    for _, mark in ipairs(marks) do
+        local ext_id = api.nvim_buf_set_extmark(buf, M.ns_id, mark.line - 1, -1, {
             virt_text = { { text } },
             virt_text_pos = "eol",
             hl_mode = "combine",

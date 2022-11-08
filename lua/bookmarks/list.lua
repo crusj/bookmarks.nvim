@@ -86,7 +86,7 @@ function M.get_buf_bookmark_lines(buf)
     local tmp = {}
     for _, each in pairs(group) do
         if data.bookmarks[each] ~= nil and tmp[data.bookmarks[each].line] == nil then
-            lines[#lines + 1] = data.bookmarks[each].line
+            lines[#lines + 1] = data.bookmarks[each]
             tmp[data.bookmarks[each].line] = true
         end
     end
@@ -282,6 +282,24 @@ function M.load_data()
     data.loaded_data = true -- mark
     data.data_dir = data_dir
     data.data_filename = data_filename
+end
+
+function M.show_desc()
+    local line = vim.fn.line(".")
+    local filename = api.nvim_buf_get_name(0)
+    local group = data.bookmarks_groupby_filename[filename]
+    if group == nil then
+        return
+    end
+
+    for _, each in pairs(group) do
+        local bm = data.bookmarks[each]
+        if  bm ~= nil and bm.line == line then
+            print(os.date("%Y-%m-%d %H:%M:%S", bm.updated_at),bm.description)
+            return
+        end
+    end
+
 end
 
 -- dofile

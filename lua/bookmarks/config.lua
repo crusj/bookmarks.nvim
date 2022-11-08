@@ -11,6 +11,7 @@ function M.setup(user_config)
             delete = "dd", -- delete bookmarks
             order = "<space><space>", -- order bookmarks by frequency or updated_time
             delete_on_virt = "\\dd", -- delete bookmark at virt text line
+            show_desc = "\\sd" -- show bookmark desc
         },
         width = 0.8, -- bookmarks window width:  (0, 1]
         height = 0.7, -- bookmarks window height: (0, 1]
