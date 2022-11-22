@@ -2,7 +2,7 @@
 Remember file locations and sort by time and frequency.
 ## Description
 
-This plugin is used to mark any position of the file and jump to it. It can add notes when marking and persist the mark to the file when nvim exits for the next load. 
+This plugin is used to mark any position of the file and jump to it. It can add notes when marking and persist the mark to the file when nvim exits for the next load.
 
 Each time you jump from a bookmark, the update time of the current bookmark will be updated and the usage frequency will be increased by one. You can sort bookmarks by time or frequency when browsing the bookmark list.
 
@@ -48,7 +48,7 @@ require("bookmarks.list").load{
 ### bookmarks list
 
 <img src="https://github.com/crusj/bookmarks.nvim/blob/main/screenshots/shot1.png" width="750">
-		
+
 
 ## Install
 
@@ -84,17 +84,17 @@ require("bookmarks").setup({
 		jump = "<CR>", -- Jump from bookmarks
 		delete = "dd", -- Delete bookmarks
 		order = "<space><space>", -- Order bookmarks by frequency or updated_time
-		delete_on_virt = "\\dd", -- Delete bookmark at virt text line 
-                show_desc = "\\sd", -- show bookmark desc
+		delete_on_virt = "\\dd", -- Delete bookmark at virt text line
+        show_desc = "\\sd", -- show bookmark desc
 	},
     width = 0.8, -- Bookmarks window width:  (0, 1]
     height = 0.6, -- Bookmarks window height: (0, 1]
     preview_ratio = 0.4, -- Bookmarks preview window ratio (0, 1]
     preview_ext_enable = false, -- If true, preview buf will add file ext, preview window may be highlighed(treesitter), but may be slower.
     fix_enable = true, -- If true, when saving the current file, if the bookmark line number of the current file changes, try to fix it.
-    hl_cursorline = "guibg=Gray guifg=White" -- hl bookmarsk window cursorline.
-    
-    virt_text = "💫" , -- Show virt text at the end of bookmarked lines
+    hl_cursorline = "guibg=Gray guifg=White", -- hl bookmarsk window cursorline.
+
+    virt_text = "💫", -- Show virt text at the end of bookmarked lines
     virt_pattern = { "*.go", "*.lua", "*.sh", "*.php", "*.rust" } -- Show virt text only on matched pattern
 })
 ```
