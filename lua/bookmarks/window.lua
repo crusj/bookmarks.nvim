@@ -18,6 +18,17 @@ local function bookmarks_autocmd(buffer)
             local line = api.nvim_eval("line('.')")
             local item = data.bookmarks[data.bookmarks_order_ids[line]] or {}
 
+            local bookmarks_len = 0
+            for _, _ in pairs(data.bookmarks) do
+                bookmarks_len = bookmarks_len + 1
+            end
+
+            local cur_line = line
+            if bookmarks_len == 0 then
+                cur_line = 0
+            end
+
+            M.set_title(data.bufbb, string.format("Bookmarks[%d/%d]", cur_line, bookmarks_len), data.bw)
             M.preview_bookmark(item.filename, item.line)
         end,
         buffer = buffer,
@@ -56,10 +67,11 @@ function M.open_bookmarks()
     data.bw = math.floor(width * (1 - config.preview_ratio))
     data.bh = height
 
+
     local options = {
         width = data.bw,
         height = data.bh,
-        title = "Bookmarks",
+        title = "",
         row = math.floor((eh - height) / 2),
         col = math.floor((ew - width) / 2),
         relative = "editor"
@@ -86,6 +98,10 @@ function M.open_bookmarks()
     api.nvim_set_current_win(data.bufbw)
 
     bookmarks_autocmd(data.bufb)
+end
+
+function M.set_title(b, title, width)
+    api.nvim_buf_set_lines(b, 0, 1, false, { float.createTopLine(title, width) })
 end
 
 function M.close_bookmarks()
@@ -147,11 +163,14 @@ function M.preview_bookmark(filename, lineNumber)
         data.bufbpw = border_pair.win
     end
 
-
-    api.nvim_buf_set_lines(data.bufbp, 0, 1, false, { float.createTopLine(options.title, options.width) })
+    M.set_title(data.bufbp, options.title, options.width)
 
     if filename ~= nil then
         local lines = helper.read_all_file(filename)
+        if lines == nil then
+            return
+        end
+
         data.filename = filename
         data.lineNumber = lineNumber
         api.nvim_buf_set_option(data.bufp, "modifiable", true)
@@ -185,7 +204,7 @@ function M.close_preview()
     end
 
     if api.nvim_buf_is_valid(data.bufp) then
-        api.nvim_buf_delete(data.bufp,{})
+        api.nvim_buf_delete(data.bufp, {})
         M.close_preview_border()
     end
 
