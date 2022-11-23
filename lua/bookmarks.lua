@@ -34,15 +34,7 @@ end
 
 function M.close_bookmarks()
     w.close_bookmarks()
-
-    if vim.api.nvim_win_is_valid(data.last_win) then
-        vim.api.nvim_set_current_win(data.last_win)
-    end
-
-    if vim.api.nvim_buf_is_valid(data.last_buf) then
-        m.set_marks(data.last_buf, l.get_buf_bookmark_lines(data.last_buf))
-    end
-
+    l.restore()
 end
 
 function M.open_bookmarks()

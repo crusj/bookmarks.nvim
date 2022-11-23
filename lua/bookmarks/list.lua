@@ -190,6 +190,7 @@ function M.jump(line)
 
     if item == nil then
         w.close_bookmarks()
+        M.restore()
         return
     end
 
@@ -223,6 +224,17 @@ function M.jump(line)
 
     ::continue::
     w.close_bookmarks()
+end
+
+function M.restore()
+    if vim.api.nvim_win_is_valid(data.last_win) then
+        vim.api.nvim_set_current_win(data.last_win)
+    end
+
+    -- refresh virtual marks
+    if vim.api.nvim_buf_is_valid(data.last_buf) then
+        m.set_marks(data.last_buf, M.get_buf_bookmark_lines(data.last_buf))
+    end
 end
 
 -- write bookmarks into disk file for next load
@@ -300,8 +312,8 @@ function M.show_desc()
 
     for _, each in pairs(group) do
         local bm = data.bookmarks[each]
-        if  bm ~= nil and bm.line == line then
-            print(os.date("%Y-%m-%d %H:%M:%S", bm.updated_at),bm.description)
+        if bm ~= nil and bm.line == line then
+            print(os.date("%Y-%m-%d %H:%M:%S", bm.updated_at), bm.description)
             return
         end
     end
