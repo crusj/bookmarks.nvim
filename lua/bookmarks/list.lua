@@ -187,6 +187,12 @@ end
 -- jump
 function M.jump(line)
     local item = data.bookmarks[data.bookmarks_order_ids[line]]
+
+    if item == nil then
+        w.close_bookmarks()
+        return
+    end
+
     data.bookmarks[data.bookmarks_order_ids[line]].fre = data.bookmarks[data.bookmarks_order_ids[line]].fre + 1
     data.bookmarks[data.bookmarks_order_ids[line]].updated_at = os.time()
 
