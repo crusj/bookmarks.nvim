@@ -95,7 +95,7 @@ require("bookmarks").setup({
     hl_cursorline = "guibg=Gray guifg=White", -- hl bookmarsk window cursorline.
 
     virt_text = "💫", -- Show virt text at the end of bookmarked lines
-    virt_pattern = { "*.go", "*.lua", "*.sh", "*.php", "*.rust" } -- Show virt text only on matched pattern
+    virt_pattern = { "*.go", "*.lua", "*.sh", "*.php", "*.rs" } -- Show virt text only on matched pattern
 })
 ```
 ## TODO
