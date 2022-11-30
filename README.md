@@ -98,6 +98,13 @@ require("bookmarks").setup({
     virt_pattern = { "*.go", "*.lua", "*.sh", "*.php", "*.rust" } -- Show virt text only on matched pattern
 })
 ```
+
+## Highlights
+
+| Highlight               | Purpose                                |
+| ----------------------- | -------------------------------------- |
+| bookmarks_virt_text     | Highlight of the virt_text             |
+
 ## TODO
 - [x] Fix bookmarks when file changed
 - [ ] Categorize
