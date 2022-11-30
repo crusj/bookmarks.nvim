@@ -36,7 +36,7 @@ function M.set_marks(buf, marks)
     -- set new old ext
     for _, mark in ipairs(marks) do
         local ext_id = api.nvim_buf_set_extmark(buf, M.ns_id, mark.line - 1, -1, {
-            virt_text = { { text } },
+            virt_text = { { text, "bookmarks_virt_text" } },
             virt_text_pos = "eol",
             hl_mode = "combine",
         })
