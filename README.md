@@ -78,23 +78,23 @@ require("bookmarks").setup()
 
 ```lua
 require("bookmarks").setup({
-	keymap = {
-		toggle = "<tab><tab>", -- Toggle bookmarks
-		add = "\\z", -- Add bookmarks
-		jump = "<CR>", -- Jump from bookmarks
-		delete = "dd", -- Delete bookmarks
-		order = "<space><space>", -- Order bookmarks by frequency or updated_time
-		delete_on_virt = "\\dd", -- Delete bookmark at virt text line
+    keymap = {
+        toggle = "<tab><tab>", -- Toggle bookmarks
+        add = "\\z", -- Add bookmarks
+        jump = "<CR>", -- Jump from bookmarks
+        delete = "dd", -- Delete bookmarks
+        order = "<space><space>", -- Order bookmarks by frequency or updated_time
+        delete_on_virt = "\\dd", -- Delete bookmark at virt text line
         show_desc = "\\sd", -- show bookmark desc
-	},
+    },
     width = 0.8, -- Bookmarks window width:  (0, 1]
     height = 0.6, -- Bookmarks window height: (0, 1]
     preview_ratio = 0.4, -- Bookmarks preview window ratio (0, 1]
     preview_ext_enable = false, -- If true, preview buf will add file ext, preview window may be highlighed(treesitter), but may be slower.
-    fix_enable = true, -- If true, when saving the current file, if the bookmark line number of the current file changes, try to fix it.
+    fix_enable = false, -- If true, when saving the current file, if the bookmark line number of the current file changes, try to fix it.
     hl_cursorline = "guibg=Gray guifg=White", -- hl bookmarsk window cursorline.
 
-    virt_text = "💫", -- Show virt text at the end of bookmarked lines
+    virt_text = "🔖", -- Show virt text at the end of bookmarked lines
     virt_pattern = { "*.go", "*.lua", "*.sh", "*.php", "*.rs" } -- Show virt text only on matched pattern
 })
 ```
@@ -105,6 +105,13 @@ require("bookmarks").setup({
 | ----------------------- | -------------------------------------- |
 | bookmarks_virt_text     | Highlight of the virt_text             |
 
+## Issue
+
+Bookmark are realized by storing the file name and line number where the bookmark is added.<br>
+If the buf changes, the line number where the bookmark content is located may not match the real situation, the bookmark still points to the old one.
+Some time ago, I recorded the hash value of the line text where the bookmark is located. When the buf is saved, it will traverse all the bookmarks of the current buf, relative to the change of the total number of lines in the buf, look up or down for the line content equal to the bookmark hash value, and update the bookmark position, which works somewhat, but often fails. The fix_enable option is set to false by defalut.<br>
+I'm thinking of a better way to do it. 🤔<br>
+Ideas welcome. 🥳
+
 ## TODO
-- [x] Fix bookmarks when file changed
-- [ ] Categorize
+- [x] Fix bookmarks when buf changed. 
