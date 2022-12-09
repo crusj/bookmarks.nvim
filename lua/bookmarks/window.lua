@@ -184,12 +184,15 @@ function M.preview_bookmark(filename, lineNumber)
 
         local cw = api.nvim_get_current_win()
 
-        api.nvim_win_set_cursor(data.bufpw, { lineNumber, 0 })
         api.nvim_win_set_option(data.bufpw, "cursorline", true)
         api.nvim_win_set_option(data.bufpw, "number", true)
         api.nvim_win_set_option(data.bufpw, "winhighlight", 'Normal:normal')
 
         api.nvim_set_current_win(data.bufpw)
+        if lineNumber <= vim.fn.line("$") then
+            api.nvim_win_set_cursor(data.bufpw, { lineNumber, 0 })
+        end
+
         vim.fn.execute("normal! zz")
 
         api.nvim_set_current_win(cw)

@@ -35,12 +35,17 @@ function M.set_marks(buf, marks)
 
     -- set new old ext
     for _, mark in ipairs(marks) do
+        if mark.line > vim.fn.line("$") then
+            goto continue 
+        end
+
         local ext_id = api.nvim_buf_set_extmark(buf, M.ns_id, mark.line - 1, -1, {
             virt_text = { { text, "bookmarks_virt_text" } },
             virt_text_pos = "eol",
             hl_mode = "combine",
         })
         M.marks[file_name][#M.marks[file_name] + 1] = ext_id
+        ::continue::
     end
 end
 
