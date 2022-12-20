@@ -197,6 +197,10 @@ function M.preview_bookmark(filename, lineNumber)
 
         api.nvim_set_current_win(cw)
 
+    else
+        -- clear preview
+        api.nvim_buf_set_option(data.bufp, "modifiable", true)
+        api.nvim_buf_set_lines(data.bufp, 0, -1, false, {})
         api.nvim_buf_set_option(data.bufp, "modifiable", false)
     end
 end
