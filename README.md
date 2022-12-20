@@ -99,6 +99,15 @@ require("bookmarks").setup({
 })
 ```
 
+### Steps
+* Move the cursor to the line of the file that needs to be bookmarked.
+* Press `\\z` in normal mode, and input a description in the pop-up shortcut window.
+* Press enter in insert mode to add, or press esc in normal mode to cancel adding bookmarks.
+* Press `<tab><tab>` to open or close the bookmark list window.
+* Move the cursor in the bookmark list window, press `enter` to jump to the file line where the bookmark is located.
+* Press `<space><space>` in the bookmark list window to switch sorting rules.
+* Press `dd` in the bookmark list to delete a bookmark.
+
 ## Highlights
 
 | Highlight               | Purpose                                |

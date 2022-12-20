@@ -35,6 +35,10 @@ function M.add_bookmark(line, content, filename, rows)
 end
 
 function M.handle_add(line, buf1, buf2, content, filename, rows)
+    if filename == nil or filename == "" then
+        return
+    end
+
     local input_line = vim.fn.line(".")
     local description = api.nvim_buf_get_lines(buf1, input_line - 1, input_line, false)[1] or ""
     if description ~= "" then
@@ -149,6 +153,10 @@ function M.flush()
     data.bookmarks_order_ids = {}
     local lines = {}
     for _, item in ipairs(tmp_data) do
+        if item.filename == nil or item.filename == "" then
+            goto continue
+        end
+
         local s = item.filename:split_b("/")
         local rep1 = math.floor(data.bw * 0.3)
         local rep2 = math.floor(data.bw * 0.5)
@@ -164,6 +172,7 @@ function M.flush()
         lines[#lines + 1] = string.format("%s %s [%s]", M.padding(item.description, rep1),
             M.padding(icon .. " " .. s[#s], rep2), tmp)
         data.bookmarks_order_ids[#data.bookmarks_order_ids + 1] = item.id
+        ::continue::
     end
 
     api.nvim_buf_set_option(data.bufb, "modifiable", true)
