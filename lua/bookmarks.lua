@@ -7,6 +7,7 @@ local w = require("bookmarks.window")
 local md5 = require("bookmarks.md5")
 local data = require("bookmarks.data")
 local m = require("bookmarks.marks")
+local api = vim.api
 
 local M = {}
 
@@ -20,8 +21,7 @@ end
 -- add bookmark
 function M.add_bookmarks()
     local line = vim.fn.line('.')
-    l.add_bookmark(line, vim.api.nvim_buf_get_lines(0, line - 1, line, false)[1], vim.api.nvim_buf_get_name(0),
-        vim.fn.line("$"))
+    l.add_bookmark(line, api.nvim_get_current_buf(), vim.fn.line("$"))
 end
 
 -- open or close bookmarks window

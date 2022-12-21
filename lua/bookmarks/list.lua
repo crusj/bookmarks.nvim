@@ -15,7 +15,7 @@ function M.setup()
     M.load_data()
 end
 
-function M.add_bookmark(line, content, filename, rows)
+function M.add_bookmark(line, buf, rows)
     local bufs_pairs = w.open_add_win(line)
     api.nvim_buf_set_keymap(bufs_pairs.pairs.buf, "n", "<ESC>",
         string.format(":lua require('bookmarks.window').close_add_win(%d, %d)<cr>", bufs_pairs.pairs.buf,
@@ -23,18 +23,18 @@ function M.add_bookmark(line, content, filename, rows)
         { silent = true })
 
     api.nvim_buf_set_keymap(bufs_pairs.pairs.buf, "i", "<CR>",
-        string.format("<esc><cmd>lua require('bookmarks.list').handle_add(%d, %d, %d, [[%s]], [[%s]], %d)<cr>",
+        string.format("<esc><cmd>lua require('bookmarks.list').handle_add(%d, %d, %d, %d, %d)<cr>",
             line,
             bufs_pairs.pairs.buf,
             bufs_pairs.border_pairs.buf,
-            content,
-            filename,
+            buf,
             rows
         ),
         { silent = true, noremap = true })
 end
 
-function M.handle_add(line, buf1, buf2, content, filename, rows)
+function M.handle_add(line, buf1, buf2, buf,  rows)
+    local filename = api.nvim_buf_get_name(buf)
     if filename == nil or filename == "" then
         return
     end
@@ -42,6 +42,7 @@ function M.handle_add(line, buf1, buf2, content, filename, rows)
     local input_line = vim.fn.line(".")
     local description = api.nvim_buf_get_lines(buf1, input_line - 1, input_line, false)[1] or ""
     if description ~= "" then
+        local content = api.nvim_buf_get_lines(buf, line - 1, line, true)[1]
         M.add(filename, line, md5.sumhexa(content),
             description, rows)
     end
