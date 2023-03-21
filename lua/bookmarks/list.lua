@@ -33,7 +33,7 @@ function M.add_bookmark(line, buf, rows)
         { silent = true, noremap = true })
 end
 
-function M.handle_add(line, buf1, buf2, buf,  rows)
+function M.handle_add(line, buf1, buf2, buf, rows)
     local filename = api.nvim_buf_get_name(buf)
     if filename == nil or filename == "" then
         return
@@ -67,7 +67,7 @@ function M.add(filename, line, line_md5, description, rows)
             description = description or "",
             updated_at = now,
             fre = 1,
-            rows = rows, -- for fix
+            rows = rows,         -- for fix
             line_md5 = line_md5, -- for fix
         }
 
@@ -195,6 +195,11 @@ function M.padding(str, len)
 end
 
 -- jump
+function M.telescope_jump_update(id)
+    data.bookmarks[id].fre = data.bookmarks[id].fre + 1
+    data.bookmarks[id].updated_at = os.time()
+end
+
 function M.jump(line)
     local item = data.bookmarks[data.bookmarks_order_ids[line]]
 
@@ -285,6 +290,7 @@ end
 
 -- restore bookmarks from disk file
 function M.load_data()
+    vim.notify("load bookmarks data", "info")
     local cwd = string.gsub(api.nvim_eval("getcwd()"), data.path_sep, "_")
     if data.cwd ~= nil and cwd ~= data.cwd then -- maybe change session
         M.persistent()
@@ -327,7 +333,6 @@ function M.show_desc()
             return
         end
     end
-
 end
 
 -- dofile

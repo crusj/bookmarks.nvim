@@ -1,13 +1,16 @@
 require("bookmarks.split")
 
-local c = require("bookmarks.config") 
+local c = require("bookmarks.config")
 local e = require("bookmarks.event")
 local l = require("bookmarks.list")
 local w = require("bookmarks.window")
-local md5 = require("bookmarks.md5")
 local data = require("bookmarks.data")
-local m = require("bookmarks.marks")
 local api = vim.api
+
+-- check module telescope is exists
+if pcall(require, "telescope") then
+    require("telescope._extensions.bookmarks")
+end
 
 local M = {}
 
