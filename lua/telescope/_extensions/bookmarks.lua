@@ -19,14 +19,16 @@ local function display_func(opts)
 
     local line_info = { opts.lnum, "TelescopeResultsLineNr" }
     local updated_at = os.date("%Y-%m-%d %H:%M:%S", opts["value"].updated_at)
+
     local common_len = helper.get_str_common_len(vim.fn.getcwd(), opts["filename"])
-    local file_name = string.sub(opts["filename"], common_len + 1)
+    local file_name = string.sub(opts["filename"], common_len + 2)
+    local icon = (require 'nvim-web-devicons'.get_icon(opts.filename)) or ""
     return displayer {
         line_info,
         opts["value"]["description"],
         opts["value"]["fre"],
         updated_at,
-        file_name,
+        icon .. " " .. file_name,
     }
 end
 
@@ -34,7 +36,7 @@ end
 local function entry_maker_func(entry)
     return {
         value = entry,
-        ordinal = entry["description"],
+        ordinal = tostring(entry["line"]),
         display = display_func,
         filename = entry["filename"],
         lnum = entry["line"],
