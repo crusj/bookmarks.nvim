@@ -36,7 +36,7 @@ end
 local function entry_maker_func(entry)
     return {
         value = entry,
-        ordinal = tostring(entry["line"]),
+        ordinal = entry["description"],
         display = display_func,
         filename = entry["filename"],
         lnum = entry["line"],
