@@ -74,7 +74,6 @@ local function picker_func(opts)
                 -- 打开文件entry.value.filename 并跳转到entry.value.line行
                 vim.api.nvim_command("edit " .. entry.value.filename)
                 vim.api.nvim_win_set_cursor(0, {entry.value.line, 0})
-                vim.api.nvim_command("normal! ".." .zz")
             end
             map("n", "<CR>", default_func)
             map("i", "<CR>", default_func)
