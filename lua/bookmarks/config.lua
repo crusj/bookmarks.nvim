@@ -22,6 +22,9 @@ function M.setup(user_config)
 
         virt_text = "🔖", -- Show virt text at the end of bookmarked lines
         virt_pattern = { "*.go", "*.lua", "*.sh", "*.php", "*.rs" }, -- Show virt text only on matched pattern
+        hl = {
+            border = "TelescopeBorder", -- border highlight
+        }
     }
 
     if user_config == nil or type(user_config) ~= "table" then

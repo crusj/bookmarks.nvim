@@ -134,7 +134,7 @@ function M.create_border(opts)
 
     api.nvim_win_set_option(
         border_win_buf_pair.win,
-        "winhl",
+        "winhighlight",
         "Normal:" .. opts.border_highlight
     )
 

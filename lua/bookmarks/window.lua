@@ -74,7 +74,8 @@ function M.open_bookmarks()
         title = "",
         row = math.floor((eh - height) / 2),
         col = math.floor((ew - width) / 2),
-        relative = "editor"
+        relative = "editor",
+        border_highlight = config.hl.border,
     }
 
     local pair = float.create_win(options)
@@ -149,7 +150,8 @@ function M.preview_bookmark(filename, lineNumber)
         title = title,
         row = math.floor((eh - height) / 2 + height - data.bh),
         col = math.floor((ew - width) / 2 + data.bw + 2),
-        relative = "editor"
+        relative = "editor",
+        border_highlight = config.hl.border,
     }
 
     if data.bufp == nil then
@@ -196,7 +198,6 @@ function M.preview_bookmark(filename, lineNumber)
         vim.fn.execute("normal! zz")
 
         api.nvim_set_current_win(cw)
-
     else
         -- clear preview
         api.nvim_buf_set_option(data.bufp, "modifiable", true)
