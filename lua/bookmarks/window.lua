@@ -4,12 +4,12 @@ local data = require("bookmarks.data")
 local api = vim.api
 
 local M = {}
-
 local config = nil
 
 function M.setup()
     config = require("bookmarks.config").get_data()
     vim.cmd(string.format("highlight hl_bookmarks_csl %s", config.hl.cursorline))
+    float.setup()
 end
 
 local function bookmarks_autocmd(buffer)

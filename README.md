@@ -106,6 +106,7 @@ require("bookmarks").setup({
 
     virt_text = "🔖", -- Show virt text at the end of bookmarked lines
     virt_pattern = { "*.go", "*.lua", "*.sh", "*.php", "*.rs" }, -- Show virt text only on matched pattern
+    border_style = "single", -- border style: "single", "double", "rounded" 
     hl = {
         border = "TelescopeBorder", -- border highlight
         cursorline = "guibg=Gray guifg=White", -- cursorline highlight
