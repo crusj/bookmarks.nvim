@@ -139,3 +139,7 @@ Ideas welcome. 🥳
 
 ## TODO
 - [x] Fix bookmarks when buf changed. 
+
+## 🤩🤩
+[![Star History Chart](https://api.star-history.com/svg?repos=crusj/bookmarks.nvim&type=Date)](https://api.star-history.com/svg?repos=crusj/bookmarks.nvim&type=Date)
+
