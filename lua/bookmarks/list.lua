@@ -17,20 +17,14 @@ end
 
 function M.add_bookmark(line, buf, rows)
     local bufs_pairs = w.open_add_win(line)
-    api.nvim_buf_set_keymap(bufs_pairs.pairs.buf, "n", "<ESC>",
-        string.format(":lua require('bookmarks.window').close_add_win(%d, %d)<cr>", bufs_pairs.pairs.buf,
-            bufs_pairs.border_pairs.buf),
-        { silent = true })
-
-    api.nvim_buf_set_keymap(bufs_pairs.pairs.buf, "i", "<CR>",
-        string.format("<esc><cmd>lua require('bookmarks.list').handle_add(%d, %d, %d, %d, %d)<cr>",
-            line,
-            bufs_pairs.pairs.buf,
-            bufs_pairs.border_pairs.buf,
-            buf,
-            rows
-        ),
-        { silent = true, noremap = true })
+    vim.keymap.set("n", "<ESC>",
+        function() w.close_add_win(bufs_pairs.pairs.buf, bufs_pairs.border_pairs.buf) end,
+        { silent = true, buffer = bufs_pairs.pairs.buf }
+    )
+    vim.keymap.set("i", "<CR>",
+        function() M.handle_add(line, bufs_pairs.pairs.buf, bufs_pairs.border_pairs.buf, buf, rows) end,
+        { silent = true, noremap = true, buffer = bufs_pairs.pairs.buf }
+    )
 end
 
 function M.handle_add(line, buf1, buf2, buf, rows)

@@ -85,12 +85,10 @@ function M.open_bookmarks()
     data.bufbb = float.create_border(options).buf
 
     api.nvim_buf_set_option(data.bufb, 'filetype', 'bookmarks')
-    api.nvim_buf_set_keymap(data.bufb, "n", config.keymap.jump, ":lua require'bookmarks'.jump()<cr>",
-        { silent = true })
-    api.nvim_buf_set_keymap(data.bufb, "n", config.keymap.delete, ":lua require'bookmarks'.delete()<cr>",
-        { silent = true })
-    api.nvim_buf_set_keymap(data.bufb, "n", config.keymap.order, ":lua require'bookmarks.list'.refresh(true)<cr>",
-        { silent = true })
+    local map_opts = { buffer = data.bufb, silent = true }
+    vim.keymap.set("n", config.keymap.jump, require("bookmarks").jump, map_opts)
+    vim.keymap.set("n", config.keymap.delete, require("bookmarks").delete, map_opts)
+    vim.keymap.set("n", config.keymap.order, function() require("bookmarks.list").refresh(true) end, map_opts)
 
     api.nvim_win_set_option(data.bufbw, "cursorline", true)
     api.nvim_win_set_option(data.bufbw, "wrap", false)
