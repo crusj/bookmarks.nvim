@@ -238,13 +238,15 @@ function M.open_add_win(line)
         title = "Input description",
         row = math.floor((eh - height) / 2),
         col = math.floor((ew - width) / 2),
-        relative = "editor"
+        relative = "editor",
+        border_highlight = config.hl.border,
     }
 
     local pairs = float.create_win(options)
     local border_pairs = float.create_border(options)
     api.nvim_set_current_win(pairs.win)
     api.nvim_win_set_option(pairs.win, 'winhighlight', 'Normal:normal')
+    api.nvim_buf_set_option(pairs.buf, 'filetype', 'bookmarks_input')
     vim.cmd("startinsert")
 
     return {
