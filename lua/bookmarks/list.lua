@@ -42,6 +42,7 @@ function M.handle_add(line, buf1, buf2, buf, rows)
     end
     w.close_add_win(buf1, buf2)
     m.set_marks(0, M.get_buf_bookmark_lines(0))
+    vim.cmd("stopinsert")
 end
 
 -- rows is the file line number of rows
