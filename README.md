@@ -44,13 +44,6 @@ require("bookmarks.list").load{
 }
 ```
 
-## Telescope
-
-Setup:
-`require("telescope").load_extension("bookmarks")`
-
-Command:
-`Telescope bookmarks`
 
 
 ## screenshots
@@ -71,16 +64,16 @@ Command:
 
 ```lua
 {
-	'crusj/bookmarks.nvim',
-	branch = 'main',
-	requires = { 'kyazdani42/nvim-web-devicons' },
-	config = function()
+    'crusj/bookmarks.nvim',
+    branch = 'main',
+    requires = { 'kyazdani42/nvim-web-devicons' },
+    config = function()
         require("bookmarks").setup()
-        require("telescope").load_extension("bookmarks")
+       	require("telescope").load_extension("bookmarks")
     end
 }
 ```
-** lazy **
+**lazy**
 
 ```lua
 {
@@ -89,13 +82,21 @@ Command:
         { "<tab><tab>", mode = { "n" } },
     },
     branch = 'main',
-    requires = { 'kyazdani42/nvim-web-devicons' },
+    dependencies = { 'nvim-web-devicons' },
     config = function()
         require("bookmarks").setup()
         require("telescope").load_extension("bookmarks")
     end
 }
+
+
 ```
+
+## Telescope
+
+Command:
+`Telescope bookmarks`
+
 
 ## Usage
 
