@@ -1,8 +1,6 @@
 local config = nil
 local l = require("bookmarks.list")
-local w = require("bookmarks.window")
 local m = require("bookmarks.marks")
--- local notify = require("notify")
 
 local M = {}
 local api = vim.api

@@ -1,4 +1,3 @@
-local helper = require("bookmarks.helper")
 local md5 = require("bookmarks.md5")
 local data = require("bookmarks.data")
 local api = vim.api

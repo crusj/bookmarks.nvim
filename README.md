@@ -1,5 +1,6 @@
 # bookmarks.nvim
 Remember file locations and sort by time and frequency.
+
 ## Description
 
 This plugin is used to mark any position of the file and jump to it. It can add notes when marking and persist the mark to the file when nvim exits for the next load.
@@ -43,11 +44,21 @@ require("bookmarks.list").load{
 }
 ```
 
+## Telescope
+
+Setup:
+`require("telescope").load_extension("bookmarks")`
+
+Command:
+`Telescope bookmarks`
+
+
 ## screenshots
 
 ### bookmarks list
 
 <img src="https://github.com/crusj/bookmarks.nvim/blob/main/screenshots/shot1.png" width="750">
+<img src="https://github.com/crusj/bookmarks.nvim/blob/main/screenshots/shot2.png" width="750">
 
 
 ## Install
@@ -106,10 +117,14 @@ require("bookmarks").setup({
     preview_ratio = 0.4, -- Bookmarks preview window ratio (0, 1]
     preview_ext_enable = false, -- If true, preview buf will add file ext, preview window may be highlighed(treesitter), but may be slower.
     fix_enable = false, -- If true, when saving the current file, if the bookmark line number of the current file changes, try to fix it.
-    hl_cursorline = "guibg=Gray guifg=White", -- hl bookmarsk window cursorline.
 
     virt_text = "🔖", -- Show virt text at the end of bookmarked lines
-    virt_pattern = { "*.go", "*.lua", "*.sh", "*.php", "*.rs" } -- Show virt text only on matched pattern
+    virt_pattern = { "*.go", "*.lua", "*.sh", "*.php", "*.rs" }, -- Show virt text only on matched pattern
+    border_style = "single", -- border style: "single", "double", "rounded" 
+    hl = {
+        border = "TelescopeBorder", -- border highlight
+        cursorline = "guibg=Gray guifg=White", -- cursorline highlight
+    }
 })
 ```
 
@@ -138,3 +153,7 @@ Ideas welcome. 🥳
 
 ## TODO
 - [x] Fix bookmarks when buf changed. 
+
+## 🤩🤩
+[![Star History Chart](https://api.star-history.com/svg?repos=crusj/bookmarks.nvim&type=Date)](https://api.star-history.com/svg?repos=crusj/bookmarks.nvim&type=Date)
+

@@ -1,14 +1,40 @@
 local api = vim.api
 local M = {}
 
-local border_chars = {
-    TOP_LEFT = "┌",
-    TOP_RIGHT = "┐",
-    MID_HORIZONTAL = "─",
-    MID_VERTICAL = "│",
-    BOTTOM_LEFT = "└",
-    BOTTOM_RIGHT = "┘",
+local config = nil
+
+local border_chars_types = {
+    single = {
+        TOP_LEFT = "┌",
+        TOP_RIGHT = "┐",
+        MID_HORIZONTAL = "─",
+        MID_VERTICAL = "│",
+        BOTTOM_LEFT = "└",
+        BOTTOM_RIGHT = "┘",
+    },
+    rounded = {
+        TOP_LEFT = "╭",
+        TOP_RIGHT = "╮",
+        MID_HORIZONTAL = "─",
+        MID_VERTICAL = "│",
+        BOTTOM_LEFT = "╰",
+        BOTTOM_RIGHT = "╯",
+    },
+    double = {
+        TOP_LEFT = "╔",
+        TOP_RIGHT = "╗",
+        MID_HORIZONTAL = "═",
+        MID_VERTICAL = "║",
+        BOTTOM_LEFT = "╚",
+        BOTTOM_RIGHT = "╝",
+    }
 }
+local border_chars = {}
+
+function M.setup()
+    config = require("bookmarks.config").get_data()
+    border_chars = border_chars_types[config.border_style or "single"]
+end
 
 local default_opts = {
     relative = "editor",
@@ -134,7 +160,7 @@ function M.create_border(opts)
 
     api.nvim_win_set_option(
         border_win_buf_pair.win,
-        "winhl",
+        "winhighlight",
         "Normal:" .. opts.border_highlight
     )
 

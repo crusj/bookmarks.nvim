@@ -17,23 +17,17 @@ end
 
 function M.add_bookmark(line, buf, rows)
     local bufs_pairs = w.open_add_win(line)
-    api.nvim_buf_set_keymap(bufs_pairs.pairs.buf, "n", "<ESC>",
-        string.format(":lua require('bookmarks.window').close_add_win(%d, %d)<cr>", bufs_pairs.pairs.buf,
-            bufs_pairs.border_pairs.buf),
-        { silent = true })
-
-    api.nvim_buf_set_keymap(bufs_pairs.pairs.buf, "i", "<CR>",
-        string.format("<esc><cmd>lua require('bookmarks.list').handle_add(%d, %d, %d, %d, %d)<cr>",
-            line,
-            bufs_pairs.pairs.buf,
-            bufs_pairs.border_pairs.buf,
-            buf,
-            rows
-        ),
-        { silent = true, noremap = true })
+    vim.keymap.set("n", "<ESC>",
+        function() w.close_add_win(bufs_pairs.pairs.buf, bufs_pairs.border_pairs.buf) end,
+        { silent = true, buffer = bufs_pairs.pairs.buf }
+    )
+    vim.keymap.set("i", "<CR>",
+        function() M.handle_add(line, bufs_pairs.pairs.buf, bufs_pairs.border_pairs.buf, buf, rows) end,
+        { silent = true, noremap = true, buffer = bufs_pairs.pairs.buf }
+    )
 end
 
-function M.handle_add(line, buf1, buf2, buf,  rows)
+function M.handle_add(line, buf1, buf2, buf, rows)
     local filename = api.nvim_buf_get_name(buf)
     if filename == nil or filename == "" then
         return
@@ -48,6 +42,7 @@ function M.handle_add(line, buf1, buf2, buf,  rows)
     end
     w.close_add_win(buf1, buf2)
     m.set_marks(0, M.get_buf_bookmark_lines(0))
+    vim.cmd("stopinsert")
 end
 
 -- rows is the file line number of rows
@@ -67,7 +62,7 @@ function M.add(filename, line, line_md5, description, rows)
             description = description or "",
             updated_at = now,
             fre = 1,
-            rows = rows, -- for fix
+            rows = rows,         -- for fix
             line_md5 = line_md5, -- for fix
         }
 
@@ -195,6 +190,11 @@ function M.padding(str, len)
 end
 
 -- jump
+function M.telescope_jump_update(id)
+    data.bookmarks[id].fre = data.bookmarks[id].fre + 1
+    data.bookmarks[id].updated_at = os.time()
+end
+
 function M.jump(line)
     local item = data.bookmarks[data.bookmarks_order_ids[line]]
 
@@ -285,6 +285,7 @@ end
 
 -- restore bookmarks from disk file
 function M.load_data()
+    -- vim.notify("load bookmarks data", "info")
     local cwd = string.gsub(api.nvim_eval("getcwd()"), data.path_sep, "_")
     if data.cwd ~= nil and cwd ~= data.cwd then -- maybe change session
         M.persistent()
@@ -327,7 +328,6 @@ function M.show_desc()
             return
         end
     end
-
 end
 
 -- dofile

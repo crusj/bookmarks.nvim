@@ -4,12 +4,12 @@ local data = require("bookmarks.data")
 local api = vim.api
 
 local M = {}
-
 local config = nil
 
 function M.setup()
     config = require("bookmarks.config").get_data()
-    vim.cmd(string.format("highlight hl_bookmarks_csl %s", config.hl_cursorline))
+    vim.cmd(string.format("highlight hl_bookmarks_csl %s", config.hl.cursorline))
+    float.setup()
 end
 
 local function bookmarks_autocmd(buffer)
@@ -74,7 +74,8 @@ function M.open_bookmarks()
         title = "",
         row = math.floor((eh - height) / 2),
         col = math.floor((ew - width) / 2),
-        relative = "editor"
+        relative = "editor",
+        border_highlight = config.hl.border,
     }
 
     local pair = float.create_win(options)
@@ -84,17 +85,14 @@ function M.open_bookmarks()
     data.bufbb = float.create_border(options).buf
 
     api.nvim_buf_set_option(data.bufb, 'filetype', 'bookmarks')
-    api.nvim_buf_set_keymap(data.bufb, "n", config.keymap.jump, ":lua require'bookmarks'.jump()<cr>",
-        { silent = true })
-    api.nvim_buf_set_keymap(data.bufb, "n", config.keymap.delete, ":lua require'bookmarks'.delete()<cr>",
-        { silent = true })
-    api.nvim_buf_set_keymap(data.bufb, "n", config.keymap.order, ":lua require'bookmarks.list'.refresh(true)<cr>",
-        { silent = true })
+    local map_opts = { buffer = data.bufb, silent = true }
+    vim.keymap.set("n", config.keymap.jump, require("bookmarks").jump, map_opts)
+    vim.keymap.set("n", config.keymap.delete, require("bookmarks").delete, map_opts)
+    vim.keymap.set("n", config.keymap.order, function() require("bookmarks.list").refresh(true) end, map_opts)
 
     api.nvim_win_set_option(data.bufbw, "cursorline", true)
     api.nvim_win_set_option(data.bufbw, "wrap", false)
-    api.nvim_win_set_option(data.bufbw, "winhighlight", "CursorLine:" .. data.hl_cursorline_name)
-    api.nvim_win_set_option(data.bufbw, "winhighlight", 'Normal:normal')
+    api.nvim_win_set_option(data.bufbw, "winhighlight", 'Normal:normal,CursorLine:'..data.hl_cursorline_name)
     api.nvim_set_current_win(data.bufbw)
 
     bookmarks_autocmd(data.bufb)
@@ -149,7 +147,8 @@ function M.preview_bookmark(filename, lineNumber)
         title = title,
         row = math.floor((eh - height) / 2 + height - data.bh),
         col = math.floor((ew - width) / 2 + data.bw + 2),
-        relative = "editor"
+        relative = "editor",
+        border_highlight = config.hl.border,
     }
 
     if data.bufp == nil then
@@ -196,7 +195,6 @@ function M.preview_bookmark(filename, lineNumber)
         vim.fn.execute("normal! zz")
 
         api.nvim_set_current_win(cw)
-
     else
         -- clear preview
         api.nvim_buf_set_option(data.bufp, "modifiable", true)
@@ -240,13 +238,15 @@ function M.open_add_win(line)
         title = "Input description",
         row = math.floor((eh - height) / 2),
         col = math.floor((ew - width) / 2),
-        relative = "editor"
+        relative = "editor",
+        border_highlight = config.hl.border,
     }
 
     local pairs = float.create_win(options)
     local border_pairs = float.create_border(options)
     api.nvim_set_current_win(pairs.win)
     api.nvim_win_set_option(pairs.win, 'winhighlight', 'Normal:normal')
+    api.nvim_buf_set_option(pairs.buf, 'filetype', 'bookmarks_input')
     vim.cmd("startinsert")
 
     return {
