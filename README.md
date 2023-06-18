@@ -62,14 +62,28 @@ require("bookmarks.list").load{
 {
 	'crusj/bookmarks.nvim',
 	branch = 'main',
-	requires = { 'kyazdani42/nvim-web-devicons' }
+	requires = { 'kyazdani42/nvim-web-devicons' },
+	config = function()
+        require("bookmarks").setup()
+        require("telescope").load_extension("bookmarks")
+    end
 }
 ```
+** lazy **
 
-### Start
 ```lua
-require("bookmarks").setup()
-
+{
+    'crusj/bookmarks.nvim',
+    keys = {
+        { "<tab><tab>", mode = { "n" } },
+    },
+    branch = 'main',
+    requires = { 'kyazdani42/nvim-web-devicons' },
+    config = function()
+        require("bookmarks").setup()
+        require("telescope").load_extension("bookmarks")
+    end
+}
 ```
 
 ## Usage
