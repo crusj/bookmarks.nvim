@@ -7,7 +7,9 @@ local api = vim.api
 
 function M.setup()
     config = require("bookmarks.config").get_data()
-    M.key_bind()
+    if config.mappings_enabled then
+        M.key_bind()
+    end
     M.autocmd()
 end
 
