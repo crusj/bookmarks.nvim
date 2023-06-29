@@ -104,6 +104,7 @@ Command:
 
 ```lua
 require("bookmarks").setup({
+    mappings_enabled = true,
     keymap = {
         toggle = "<tab><tab>", -- Toggle bookmarks
         add = "\\z", -- Add bookmarks
