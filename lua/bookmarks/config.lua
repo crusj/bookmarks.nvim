@@ -4,7 +4,7 @@ local M = {
 
 function M.setup(user_config)
     M.data = {
-        mappings_enabled = true,
+        mappings_enabled = false,
         keymap = {
             toggle = "<tab><tab>", -- toggle bookmarks
             add = "\\z", -- add bookmarks
