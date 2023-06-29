@@ -104,15 +104,15 @@ Command:
 
 ```lua
 require("bookmarks").setup({
-    mappings_enabled = true,
+    mappings_enabled = false, -- Only valid for global keymaps: toggle、add、delete_on_virt、show_desc
     keymap = {
-        toggle = "<tab><tab>", -- Toggle bookmarks
-        add = "\\z", -- Add bookmarks
-        jump = "<CR>", -- Jump from bookmarks
-        delete = "dd", -- Delete bookmarks
-        order = "<space><space>", -- Order bookmarks by frequency or updated_time
-        delete_on_virt = "\\dd", -- Delete bookmark at virt text line
-        show_desc = "\\sd", -- show bookmark desc
+        toggle = "<tab><tab>", -- Toggle bookmarks(global keymap)
+        add = "\\z", -- Add bookmarks(global keymap)
+        jump = "<CR>", -- Jump from bookmarks(buf keymap)
+        delete = "dd", -- Delete bookmarks(buf keymap)
+        order = "<space><space>", -- Order bookmarks by frequency or updated_time(buf keymap)
+        delete_on_virt = "\\dd", -- Delete bookmark at virt text line(global keymap)
+        show_desc = "\\sd", -- show bookmark desc(global keymap)
     },
     width = 0.8, -- Bookmarks window width:  (0, 1]
     height = 0.6, -- Bookmarks window height: (0, 1]
@@ -138,6 +138,16 @@ require("bookmarks").setup({
 * Move the cursor in the bookmark list window, press `enter` to jump to the file line where the bookmark is located.
 * Press `<space><space>` in the bookmark list window to switch sorting rules.
 * Press `dd` in the bookmark list to delete a bookmark.
+
+## Global keymaps
+
+| Desc                              | Func                                     |
+| --------------------------------- | ---------------------------------------- |
+| Add bookmarks                     | require'bookmarks'.add_bookmarks()       |
+| Toggle bookmarks                  | require'bookmarks'.toggle_bookmarks()    |
+| Delete bookmark at virt text line | require'bookmarks.list'.delete_on_virt() |
+| Show bookmark desc                | require'bookmarks.list'.show_desc()      |
+
 
 ## Highlights
 
