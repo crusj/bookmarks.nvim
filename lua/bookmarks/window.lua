@@ -67,7 +67,6 @@ function M.open_bookmarks()
     data.bw = math.floor(width * (1 - config.preview_ratio))
     data.bh = height
 
-
     local options = {
         width = data.bw,
         height = data.bh,

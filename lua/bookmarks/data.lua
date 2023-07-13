@@ -1,7 +1,4 @@
 local M = {
-    is_windows = false,
-    path_sep = "/",
-
     bookmarks = {}, -- filename description fre id line updated_at line_md5
     bookmarks_groupby_filename = {}, -- group bookmarks by filename
     bookmarks_order_ids = {},

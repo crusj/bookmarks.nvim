@@ -106,6 +106,7 @@ Command:
 require("bookmarks").setup({
     mappings_enabled = true, -- If the value is false, only valid for global keymaps: toggle、add、delete_on_virt、show_desc
     keymap = {
+        storage_dir = "",  -- Default path: vim.fn.stdpath("data").."/bookmarks",
         toggle = "<tab><tab>", -- Toggle bookmarks(global keymap)
         add = "\\z", -- Add bookmarks(global keymap)
         jump = "<CR>", -- Jump from bookmarks(buf keymap)

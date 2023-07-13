@@ -3,15 +3,12 @@ local w = require("bookmarks.window")
 local data = require("bookmarks.data")
 local m = require("bookmarks.marks")
 local api = vim.api
+local config
 
 local M = {}
 
 function M.setup()
-    local os_name = vim.loop.os_uname().sysname
-    data.is_windows = os_name == "Windows" or os_name == "Windows_NT"
-    if data.is_windows then
-        data.path_sep = "\\"
-    end
+    config = require"bookmarks.config".get_data()
     M.load_data()
 end
 
@@ -131,6 +128,7 @@ end
 function M.flush()
     -- for order
     local tmp_data = {}
+    
     for _, item in pairs(data.bookmarks) do
         tmp_data[#tmp_data + 1] = item
     end
@@ -286,7 +284,7 @@ end
 -- restore bookmarks from disk file
 function M.load_data()
     -- vim.notify("load bookmarks data", "info")
-    local cwd = string.gsub(api.nvim_eval("getcwd()"), data.path_sep, "_")
+    local cwd = string.gsub(api.nvim_eval("getcwd()"), config.sep_path, "_")
     if data.cwd ~= nil and cwd ~= data.cwd then -- maybe change session
         M.persistent()
         data.bookmarks = {}
@@ -297,19 +295,18 @@ function M.load_data()
         return
     end
 
-    local data_dir = string.format("%s%sbookmarks", vim.fn.stdpath("data"), data.path_sep)
-    if not vim.loop.fs_stat(data_dir) then
-        assert(os.execute("mkdir " .. data_dir))
+    if not vim.loop.fs_stat(config.storage_dir) then
+        assert(os.execute("mkdir " .. config.storage_dir))
     end
 
-    local data_filename = string.format("%s%s%s", data_dir, data.path_sep, cwd)
+    local data_filename = string.format("%s%s%s", config.storage_dir, config.sep_path, cwd)
     if vim.loop.fs_stat(data_filename) then
         dofile(data_filename)
     end
 
     data.cwd = cwd
     data.loaded_data = true -- mark
-    data.data_dir = data_dir
+    data.data_dir = config.storage_dir
     data.data_filename = data_filename
 end
 
