@@ -91,7 +91,7 @@ function M.open_bookmarks()
 
     api.nvim_win_set_option(data.bufbw, "cursorline", true)
     api.nvim_win_set_option(data.bufbw, "wrap", false)
-    api.nvim_win_set_option(data.bufbw, "winhighlight", 'Normal:normal,CursorLine:'..data.hl_cursorline_name)
+    api.nvim_win_set_option(data.bufbw, "winhighlight", 'Normal:normal,CursorLine:' .. data.hl_cursorline_name)
     api.nvim_set_current_win(data.bufbw)
 
     bookmarks_autocmd(data.bufb)

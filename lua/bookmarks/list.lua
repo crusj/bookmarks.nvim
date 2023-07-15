@@ -8,16 +8,21 @@ local config
 local M = {}
 
 function M.setup()
-    config = require"bookmarks.config".get_data()
+    config = require "bookmarks.config".get_data()
     M.load_data()
 end
 
 function M.add_bookmark(line, buf, rows)
+    --  Open the bookmark description input box.
     local bufs_pairs = w.open_add_win(line)
+
+    -- Press the esc key to cancel add bookmark.
     vim.keymap.set("n", "<ESC>",
         function() w.close_add_win(bufs_pairs.pairs.buf, bufs_pairs.border_pairs.buf) end,
         { silent = true, buffer = bufs_pairs.pairs.buf }
     )
+
+    -- Press the enter key to confirm add bookmark.
     vim.keymap.set("i", "<CR>",
         function() M.handle_add(line, bufs_pairs.pairs.buf, bufs_pairs.border_pairs.buf, buf, rows) end,
         { silent = true, noremap = true, buffer = bufs_pairs.pairs.buf }
@@ -25,27 +30,34 @@ function M.add_bookmark(line, buf, rows)
 end
 
 function M.handle_add(line, buf1, buf2, buf, rows)
+    -- Get buf's filename.
     local filename = api.nvim_buf_get_name(buf)
     if filename == nil or filename == "" then
         return
     end
 
     local input_line = vim.fn.line(".")
+    -- Get bookmark's description.
     local description = api.nvim_buf_get_lines(buf1, input_line - 1, input_line, false)[1] or ""
     if description ~= "" then
         local content = api.nvim_buf_get_lines(buf, line - 1, line, true)[1]
+        -- Save bookmark with description.
         M.add(filename, line, md5.sumhexa(content),
             description, rows)
     end
+
+    -- Close description input box.
     w.close_add_win(buf1, buf2)
     m.set_marks(0, M.get_buf_bookmark_lines(0))
     vim.cmd("stopinsert")
 end
 
--- rows is the file line number of rows
+-- Save bookmark as lua code.
+-- rows is the file's number..
 function M.add(filename, line, line_md5, description, rows)
     local id = md5.sumhexa(string.format("%s:%s", filename, line))
     local now = os.time()
+
     if data.bookmarks[id] ~= nil then --update description
         if description ~= nil then
             data.bookmarks[id].description = description
@@ -74,8 +86,8 @@ end
 function M.get_buf_bookmark_lines(buf)
     local filename = api.nvim_buf_get_name(buf)
     local lines = {}
-
     local group = data.bookmarks_groupby_filename[filename]
+
     if group == nil then
         return lines
     end
@@ -91,7 +103,7 @@ function M.get_buf_bookmark_lines(buf)
     return lines
 end
 
--- delete bookmark
+-- Delete bookmark.
 function M.delete(line)
     if data.bookmarks_order_ids[line] ~= nil then
         data.bookmarks[data.bookmarks_order_ids[line]] = nil
@@ -99,6 +111,7 @@ function M.delete(line)
     end
 end
 
+-- Delete bookmark.
 function M.delete_on_virt()
     local line = vim.fn.line(".")
     local file_name = api.nvim_buf_get_name(0)
@@ -111,7 +124,7 @@ function M.delete_on_virt()
     end
 end
 
--- mark bookmarks order by time or fre
+-- Update bookmarks list by time or frequery.
 function M.refresh(order)
     if order == true then
         if data.bookmarks_order == "time" then
@@ -124,16 +137,16 @@ function M.refresh(order)
     M.flush()
 end
 
--- flush bookmarks to float window
+-- Write the saved bookmark list to the bookmark window for display.
 function M.flush()
-    -- for order
+    -- order
     local tmp_data = {}
-    
+
     for _, item in pairs(data.bookmarks) do
         tmp_data[#tmp_data + 1] = item
     end
 
-    -- sort by order mark
+    -- sort list by time or frequery.
     if data.bookmarks_order == "time" then
         table.sort(tmp_data, function(e1, e2)
             return e1.updated_at > e2.updated_at
@@ -177,7 +190,7 @@ function M.flush()
     api.nvim_buf_set_option(data.bufb, "modifiable", false)
 end
 
--- align bookmarks display
+-- Ui: Align bookmarks display
 function M.padding(str, len)
     local tmp = M.characters(str, 2)
     if tmp > len then
@@ -187,12 +200,13 @@ function M.padding(str, len)
     end
 end
 
--- jump
+-- Jump hook.
 function M.telescope_jump_update(id)
     data.bookmarks[id].fre = data.bookmarks[id].fre + 1
     data.bookmarks[id].updated_at = os.time()
 end
 
+-- Bookmark jump.
 function M.jump(line)
     local item = data.bookmarks[data.bookmarks_order_ids[line]]
 
@@ -245,7 +259,7 @@ function M.restore()
     end
 end
 
--- write bookmarks into disk file for next load
+-- Write bookmarks into disk file for next load.
 function M.persistent()
     local tpl = [[
 require("bookmarks.list").load{
@@ -281,7 +295,7 @@ require("bookmarks.list").load{
     fd:close()
 end
 
--- restore bookmarks from disk file
+-- Restore bookmarks from disk file.
 function M.load_data()
     -- vim.notify("load bookmarks data", "info")
     local cwd = string.gsub(api.nvim_eval("getcwd()"), config.sep_path, "_")
@@ -310,6 +324,7 @@ function M.load_data()
     data.data_filename = data_filename
 end
 
+-- Print bookmark descripiton.
 function M.show_desc()
     local line = vim.fn.line(".")
     local filename = api.nvim_buf_get_name(0)
@@ -327,7 +342,7 @@ function M.show_desc()
     end
 end
 
--- dofile
+-- Dofile
 function M.load(item)
     data.bookmarks[item.id] = item
 
@@ -338,7 +353,7 @@ function M.load(item)
     data.bookmarks_groupby_filename[item.filename][#data.bookmarks_groupby_filename[item.filename] + 1] = item.id
 end
 
--- fix bookmarks alignment
+-- Character alignment.
 function M.characters(utf8Str, aChineseCharBytes)
     aChineseCharBytes = aChineseCharBytes or 2
     local i = 1
@@ -352,6 +367,7 @@ function M.characters(utf8Str, aChineseCharBytes)
     return characterSum
 end
 
+-- Character alignment.
 function M.bytes4Character(theByte)
     local seperate = { 0, 0xc0, 0xe0, 0xf0 }
     for i = #seperate, 1, -1 do

@@ -4,6 +4,7 @@ local M = {
     marks = {},
 }
 
+-- Add virtural text for bookmarks.
 function M.set_marks(buf, marks)
     local file_name = vim.api.nvim_buf_get_name(buf)
     local pattern = require("bookmarks.config").data.virt_pattern
@@ -36,7 +37,7 @@ function M.set_marks(buf, marks)
     -- set new old ext
     for _, mark in ipairs(marks) do
         if mark.line > vim.fn.line("$") then
-            goto continue 
+            goto continue
         end
 
         local ext_id = api.nvim_buf_set_extmark(buf, M.ns_id, mark.line - 1, -1, {

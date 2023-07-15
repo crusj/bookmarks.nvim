@@ -7,7 +7,7 @@ local w = require("bookmarks.window")
 local data = require("bookmarks.data")
 local api = vim.api
 
--- check module telescope is exists
+-- Check module telescope is exists.
 if pcall(require, "telescope") then
     require("telescope._extensions.bookmarks")
 end
@@ -21,26 +21,12 @@ function M.setup(user_config)
     w.setup()
 end
 
--- add bookmark
+-- Add bookmark.
 function M.add_bookmarks()
-    local line = vim.fn.line('.')
-    l.add_bookmark(line, api.nvim_get_current_buf(), vim.fn.line("$"))
+    l.add_bookmark(vim.fn.line('.'), api.nvim_get_current_buf(), vim.fn.line("$"))
 end
 
--- open or close bookmarks window
-function M.toggle_bookmarks()
-    if data.bufbw ~= nil and vim.api.nvim_win_is_valid(data.bufbw) then
-        M.close_bookmarks()
-    else
-        M.open_bookmarks()
-    end
-end
-
-function M.close_bookmarks()
-    w.close_bookmarks()
-    l.restore()
-end
-
+-- Open bookmarks window.
 function M.open_bookmarks()
     data.last_win = vim.api.nvim_get_current_win()
     data.last_buf = vim.api.nvim_get_current_buf()
@@ -51,12 +37,27 @@ function M.open_bookmarks()
     l.flush()
 end
 
--- jump to file from bookmarks
+-- Close bookmarks window.
+function M.close_bookmarks()
+    w.close_bookmarks()
+    l.restore()
+end
+
+-- Toggle bookmarks window.
+function M.toggle_bookmarks()
+    if data.bufbw ~= nil and vim.api.nvim_win_is_valid(data.bufbw) then
+        M.close_bookmarks()
+    else
+        M.open_bookmarks()
+    end
+end
+
+-- Jump to the corresponding bookmark's location.
 function M.jump()
     l.jump(vim.fn.line("."))
 end
 
--- delete bookmarks
+-- Delete bookmarks.
 function M.delete()
     l.delete(vim.fn.line('.'))
 end
