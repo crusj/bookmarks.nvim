@@ -104,7 +104,7 @@ Command:
 
 ```lua
 require("bookmarks").setup({
-    storage_dir = "",  -- Default path: vim.fn.stdpath("data").."/bookmarks",
+    storage_dir = "",  -- Default path: vim.fn.stdpath("data").."/bookmarks,  if not the default directory, should be absolute path",
     mappings_enabled = true, -- If the value is false, only valid for global keymaps: toggle、add、delete_on_virt、show_desc
     keymap = {
         toggle = "<tab><tab>", -- Toggle bookmarks(global keymap)
