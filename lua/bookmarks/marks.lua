@@ -9,25 +9,25 @@ function M.set_marks(buf, marks)
     local file_name = vim.api.nvim_buf_get_name(buf)
     local pattern = require("bookmarks.config").data.virt_pattern
     local cuts = file_name:split_b(".")
-    local t = cuts[#cuts]
-    local is_match = false
 
-    for _, p in ipairs(pattern) do
-        if string.sub(p, 3) == t then
-            is_match = true
-            break
+    if #cuts > 1 then
+        local ext = cuts[#cuts]
+        local is_match = false
+        for _, p in ipairs(pattern) do
+            if string.sub(p, 3) == ext then
+                is_match = true
+                break
+            end
         end
-    end
-    if is_match == false then
-        return
+        if is_match == false then
+            return
+        end
     end
 
     local text = require("bookmarks.config").data.virt_text
-
     if M.marks[file_name] == nil then
         M.marks[file_name] = {}
     end
-
 
     -- clear old ext
     for _, id in ipairs(M.marks[file_name]) do
