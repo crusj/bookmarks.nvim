@@ -177,7 +177,9 @@ function M.preview_bookmark(filename, lineNumber)
         if config.preview_ext_enable then
             local cuts = filename:split_b(".")
             local ext = cuts[#cuts]
-            api.nvim_buf_set_option(data.bufp, "filetype", ext)
+            if #cuts > 1 and ext ~= "" then
+                api.nvim_buf_set_option(data.bufp, "filetype", ext)
+            end
         end
 
         local cw = api.nvim_get_current_win()
