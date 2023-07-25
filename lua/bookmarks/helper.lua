@@ -37,8 +37,17 @@ local function get_str_common_len(a, b)
     return common_len
 end
 
+local function get_package_path()
+    -- Path to this source file, removing the leading '@'
+    local source = string.sub(debug.getinfo(1, "S").source, 2)
+
+    -- Path to the package root
+    return vim.fn.fnamemodify(source, ":p:h:h:h")
+end
+
 return {
     file_exists = file_exists,
     read_all_file = read_all_file,
-    get_str_common_len = get_str_common_len
+    get_str_common_len = get_str_common_len,
+    get_package_path = get_package_path
 }

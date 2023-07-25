@@ -2,8 +2,8 @@
 
 # 设置项目信息
 repo_url="https://github.com/crusj/bookmark.git"
-repo_dir="plugin"
-binary_name="libbookmark.dylib"
+repo_dir="$1"
+binary_name="$2"
 
 # 拉取仓库
 git clone $repo_url $repo_dir
@@ -23,4 +23,4 @@ mv target/release/$binary_name ../bookmark.so
 
 cd ..
 rm -rf $repo_dir
-
+echo "Done!"
