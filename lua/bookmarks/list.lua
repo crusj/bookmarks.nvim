@@ -1,7 +1,4 @@
-local runtimepath = vim.o.runtimepath
-vim.o.runtimepath = runtimepath .. ";/Users/crusj/Project/bookmark"
 local lib = require("bookmark")
-
 local w = require("bookmarks.window")
 local data = require("bookmarks.data")
 local m = require("bookmarks.marks")
@@ -74,7 +71,6 @@ function M.add(filename, line, line_md5, description, rows)
             description = description or "",
             updated_at = now,
             fre = 1,
-            rows = rows,         -- for fix
             line_md5 = line_md5, -- for fix
         }
 
