@@ -1,4 +1,7 @@
-local md5 = require("bookmarks.md5")
+local runtimepath = vim.o.runtimepath;
+vim.o.runtimepath = runtimepath .. ";/Users/crusj/Project/bookmark"
+local lib = require("bookmark")
+
 local data = require("bookmarks.data")
 local api = vim.api
 
@@ -28,7 +31,7 @@ local function fix_bookmarks()
 
 
         -- not change
-        if md5.sumhexa(text) == b.line_md5 then
+        if lib.get_md5(text) == b.line_md5 then
             goto continue
         end
 
@@ -50,7 +53,7 @@ local function fix_bookmarks()
             end
 
             local text = api.nvim_buf_get_lines(0, up_line - 1, up_line, true)[1]
-            if text ~= nil and md5.sumhexa(text) == b.line_md5 then
+            if text ~= nil and lib.get_md5(text) == b.line_md5 then
                 data.bookmarks[id].line = up_line
                 data.bookmarks[id].rows = rows
                 goto continue
@@ -66,7 +69,7 @@ local function fix_bookmarks()
             end
 
             local text = api.nvim_buf_get_lines(0, down_line - 1, down_line, true)[1]
-            if text ~= nil and md5.sumhexa(text) == b.line_md5 then
+            if text ~= nil and lib.get_md5(text) == b.line_md5 then
                 data.bookmarks[id].line = down_line
                 data.bookmarks[id].rows = rows
                 goto continue

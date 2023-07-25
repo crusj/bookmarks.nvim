@@ -1,5 +1,4 @@
 require("bookmarks.split")
-
 local c = require("bookmarks.config")
 local e = require("bookmarks.event")
 local l = require("bookmarks.list")

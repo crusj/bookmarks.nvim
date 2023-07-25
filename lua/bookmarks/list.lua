@@ -1,4 +1,7 @@
-local md5 = require("bookmarks.md5")
+local runtimepath = vim.o.runtimepath
+vim.o.runtimepath = runtimepath .. ";/Users/crusj/Project/bookmark"
+local lib = require("bookmark")
+
 local w = require("bookmarks.window")
 local data = require("bookmarks.data")
 local m = require("bookmarks.marks")
@@ -42,7 +45,7 @@ function M.handle_add(line, buf1, buf2, buf, rows)
     if description ~= "" then
         local content = api.nvim_buf_get_lines(buf, line - 1, line, true)[1]
         -- Save bookmark with description.
-        M.add(filename, line, md5.sumhexa(content),
+        M.add(filename, line, lib.get_md5(content),
             description, rows)
     end
 
@@ -55,7 +58,7 @@ end
 -- Save bookmark as lua code.
 -- rows is the file's number..
 function M.add(filename, line, line_md5, description, rows)
-    local id = md5.sumhexa(string.format("%s:%s", filename, line))
+    local id = lib.get_md5(string.format("%s:%s", filename, line))
     local now = os.time()
 
     if data.bookmarks[id] ~= nil then --update description
