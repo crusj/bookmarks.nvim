@@ -164,8 +164,25 @@ Some time ago, I recorded the hash value of the line text where the bookmark is 
 I'm thinking of a better way to do it. 🤔<br>
 Ideas welcome. 🥳
 
-## Fix
-It is now possible to use the feature/fix branch to try to automatically correct the bookmark position when the file is saved，it is still experimental.
+## Issue(imperfect)
+* A `feature/fix` branch is now available to attempt to automatically correct bookmark positions when saving files if bookmark positions change, this is still experimental.
+* I am now trying to write some extensions using rust in the `feature/fix` branch, so you need to use `curl https://sh.rustup.rs -sSf | sh` to install `cargo`.
+* In addition, in macOS system, you need to add some additional configuration in `~/.cargo/config`
+```toml
+[target.x86_64-apple-darwin]
+rustflags = [
+  "-C", "link-arg=-undefined",
+  "-C", "link-arg=dynamic_lookup",
+]
+
+[target.aarch64-apple-darwin]
+rustflags = [
+  "-C", "link-arg=-undefined",
+  "-C", "link-arg=dynamic_lookup",
+]
+```
+* If you are not a lazy plugin manager(build.lua), you need to execute `require "bookmarks.install"`
+
 
 ## 🤩🤩
 [![Star History Chart](https://api.star-history.com/svg?repos=crusj/bookmarks.nvim&type=Date)](https://api.star-history.com/svg?repos=crusj/bookmarks.nvim&type=Date)
