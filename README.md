@@ -164,8 +164,8 @@ Some time ago, I recorded the hash value of the line text where the bookmark is 
 I'm thinking of a better way to do it. 🤔<br>
 Ideas welcome. 🥳
 
-## TODO
-- [x] Fix bookmarks when buf changed. 
+## Fix
+It is now possible to use the feature/fix branch to try to automatically correct the bookmark position when the file is saved，it is still experimental.
 
 ## 🤩🤩
 [![Star History Chart](https://api.star-history.com/svg?repos=crusj/bookmarks.nvim&type=Date)](https://api.star-history.com/svg?repos=crusj/bookmarks.nvim&type=Date)
