@@ -1,3 +1,4 @@
+require("bookmarks.split")
 local c = require("bookmarks.config")
 local e = require("bookmarks.event")
 local l = require("bookmarks.list")
@@ -13,8 +14,6 @@ end
 local M = {}
 
 function M.setup(user_config)
-    require("bookmarks.split")
-    require("bookmarks.install")
     c.setup(user_config)
     l.setup()
     e.setup()
