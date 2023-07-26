@@ -9,13 +9,11 @@ if not vim.loop.fs_stat(install_path .. "/bookmark.so") then
     local shell_script = package_root .. "/install.sh"
     local os_name = helper.get_os_type()
     local plugin_name = ""
-    print(os_name)
     if os_name == "macOS" then
         plugin_name = "libbookmark.dylib"
     elseif os_name == "Linux" then
         plugin_name = "libbookmark.so"
     end
-    print(plugin_name)
     vim.notify("Install bookmark plugin...", vim.log.levels.INFO)
     vim.fn.jobstart({ "sh", shell_script, install_path .. "/bookmark", plugin_name }, {
         on_stdout = function(_, data)
