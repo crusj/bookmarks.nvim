@@ -1,5 +1,5 @@
-local lib = require("bookmark")
 local data = require("bookmarks.data")
+local helper = require("bookmarks.helper")
 local api = vim.api
 
 local function fix_bookmarks()
@@ -14,7 +14,7 @@ local function fix_bookmarks()
         bookmarks[#bookmarks + 1] = data.bookmarks[id];
     end
 
-    local fixed_bookmarks = lib.fix(filename, bookmarks)
+    local fixed_bookmarks = helper.get_lib().fix(filename, bookmarks)
     if #fixed_bookmarks == 0 then
         data.bookmarks = {};
         data.bookmarks_groupby_filename = {};

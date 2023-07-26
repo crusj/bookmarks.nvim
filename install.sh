@@ -6,12 +6,12 @@ repo_dir="$1"
 binary_name="$2"
 
 # 拉取仓库
-git clone $repo_url $repo_dir
-
+echo "[1/3] Installing lib for bookmarks...."
 # 进入项目目录
 cd $repo_dir
 
 # 使用Rust编译
+echo "[2/3] cargo build --release"
 cargo build --release
 
 # 可选：移动编译后的二进制文件到指定位置
@@ -22,5 +22,4 @@ mv target/release/$binary_name ../bookmark.so
 # cargo clean
 
 cd ..
-rm -rf $repo_dir
-echo "Done!"
+echo "[3/3] done"

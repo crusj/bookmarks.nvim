@@ -1,3 +1,4 @@
+local lib = nil
 -- check file is exists
 local function file_exists(filename)
     local f = io.open(filename, "rb")
@@ -45,9 +46,35 @@ local function get_package_path()
     return vim.fn.fnamemodify(source, ":p:h:h:h")
 end
 
+local function get_lib()
+    if lib == nil then
+        if not string.find(package.cpath, "bookmark.so") then
+            package.cpath = package.cpath .. ";" .. get_package_path() .. "/lib/bookmark.so"
+        end
+        lib = require("bookmark")
+    end
+
+    return lib
+end
+
+local function get_os_type()
+    local uname_info = vim.loop.os_uname()
+    if uname_info.sysname == "Linux" then
+        return "Linux"
+    elseif uname_info.sysname == "Darwin" then
+        return "macOS"
+    elseif uname_info.sysname == "Windows" then
+        return "Windows"
+    else
+        return "Unknown"
+    end
+end
+
 return {
     file_exists = file_exists,
     read_all_file = read_all_file,
     get_str_common_len = get_str_common_len,
-    get_package_path = get_package_path
+    get_package_path = get_package_path,
+    get_lib = get_lib,
+    get_os_type = get_os_type
 }
