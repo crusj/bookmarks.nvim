@@ -68,8 +68,7 @@ end
 local function get_lib()
     if lib == nil then
         if not string.find(package.cpath, "bookmark.so") then
-            local cname = get_package_path() .. "/lib/" .. get_c_path() .. "./bookmark.so"
-            print(cname)
+            local cname = get_package_path() .. "/lib/" .. get_c_path() .. "/bookmark.so"
             if not vim.loop.fs_stat(cname) then
                 vim.notify("Can't find " .. cname, vim.log.levels.ERROR)
                 return nil
