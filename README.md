@@ -166,8 +166,8 @@ Ideas welcome. 🥳
 
 ## Issue(imperfect)
 * A `feature/fix` branch is now available to attempt to automatically correct bookmark positions when saving files if bookmark positions change, this is still experimental.
-* I am now trying to write some extensions using rust in the `feature/fix` branch, so you need to use `curl https://sh.rustup.rs -sSf | sh` to install `cargo`.
-* In addition, in macOS system, you need to add some additional configuration in `~/.cargo/config`
+* ~~I am now trying to write some extensions using rust in the `feature/fix` branch, so you need to use `curl https://sh.rustup.rs -sSf | sh` to install `cargo`.~~
+* ~~In addition, in macOS system, you need to add some additional configuration in `~/.cargo/config`~~
 ```toml
 [target.x86_64-apple-darwin]
 rustflags = [
@@ -181,7 +181,9 @@ rustflags = [
   "-C", "link-arg=dynamic_lookup",
 ]
 ```
-* If you are not a lazy plugin manager(build.lua), you need to execute `require "bookmarks.install"`
+* ~~If you are not a lazy plugin manager(build.lua), you need to execute `require "bookmarks.install"`~~
+* For convenience, I uploaded the compiled so file.
+* Currently tested are darwin(intel and silicon) and linux(x86-64).
 
 
 ## 🤩🤩
