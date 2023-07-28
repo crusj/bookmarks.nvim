@@ -46,23 +46,18 @@ local function get_package_path()
     return vim.fn.fnamemodify(source, ":p:h:h:h")
 end
 
-local function get_lib()
-    if lib == nil then
-        if not string.find(package.cpath, "bookmark.so") then
-            package.cpath = package.cpath .. ";" .. get_package_path() .. "/lib/bookmark.so"
-        end
-        lib = require("bookmark")
-    end
-
-    return lib
-end
-
-local function get_os_type()
+local function get_c_path()
     local uname_info = vim.loop.os_uname()
     if uname_info.sysname == "Linux" then
-        return "Linux"
+        if uname_info.machine == "x86_64" then
+            return "linux_x86_64"
+        end
     elseif uname_info.sysname == "Darwin" then
-        return "macOS"
+        if uname_info.machine == "x86_64" then
+            return "darwin_intel"
+        else
+            return "darwin_silicon"
+        end
     elseif uname_info.sysname == "Windows" then
         return "Windows"
     else
@@ -70,11 +65,30 @@ local function get_os_type()
     end
 end
 
+local function get_lib()
+    if lib == nil then
+        if not string.find(package.cpath, "bookmark.so") then
+            local cname = get_package_path() .. "/lib/" .. get_c_path() .. "./bookmark.so"
+            print(cname)
+            if not vim.loop.fs_stat(cname) then
+                vim.notify("Can't find " .. cname, vim.log.levels.ERROR)
+                return nil
+            end
+
+            package.cpath = package.cpath .. ";" .. cname
+        end
+        lib = require("bookmark")
+    end
+
+    return lib
+end
+
+
 return {
     file_exists = file_exists,
     read_all_file = read_all_file,
     get_str_common_len = get_str_common_len,
     get_package_path = get_package_path,
     get_lib = get_lib,
-    get_os_type = get_os_type
+    get_os_type = get_c_path
 }

@@ -1,1 +1,1 @@
-require("bookmarks.install")
+-- require("bookmarks.install")

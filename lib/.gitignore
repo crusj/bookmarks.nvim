@@ -1,4 +1,3 @@
-*.so
 !.gitignore
 bookmark/target
 bookmark/Cargo.lock
