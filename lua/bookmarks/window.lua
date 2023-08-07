@@ -103,21 +103,27 @@ end
 
 function M.close_bookmarks()
     -- delete CursorMoved event
-    api.nvim_del_autocmd(data.event1)
+    if data.event1 ~= nil then
+        api.nvim_del_autocmd(data.event1)
+        data.event1 = nil
+    end
     -- delete BufWinLeave event
-    api.nvim_del_autocmd(data.event2)
+    if data.event2 ~= nil then
+        api.nvim_del_autocmd(data.event2)
+        data.event2 = nil
+    end
 
-    if api.nvim_buf_is_valid(data.bufb) then
+    if data.bufb ~= nil and api.nvim_buf_is_valid(data.bufb) then
         api.nvim_buf_delete(data.bufb, {})
         data.bufb = nil
     end
 
-    if api.nvim_win_is_valid(data.bufbw) then
+    if data.bufbw ~= nil and api.nvim_win_is_valid(data.bufbw) then
         api.nvim_win_close(data.bufbw, true)
         data.bufbw = nil
     end
 
-    if api.nvim_buf_is_valid(data.bufbb) then
+    if data.bufbb ~= nil and api.nvim_buf_is_valid(data.bufbb) then
         vim.cmd(string.format("bwipeout! %d", data.bufbb))
         data.bufbb = nil
     end
