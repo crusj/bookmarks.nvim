@@ -249,12 +249,12 @@ function M.jump(line)
 end
 
 function M.restore()
-    if vim.api.nvim_win_is_valid(data.last_win) then
+    if data.last_win ~= nil and vim.api.nvim_win_is_valid(data.last_win) then
         vim.api.nvim_set_current_win(data.last_win)
     end
 
     -- refresh virtual marks
-    if vim.api.nvim_buf_is_valid(data.last_buf) then
+    if data.last_buf ~= nil and vim.api.nvim_buf_is_valid(data.last_buf) then
         m.set_marks(data.last_buf, M.get_buf_bookmark_lines(data.last_buf))
     end
 end
