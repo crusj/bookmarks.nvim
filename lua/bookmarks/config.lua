@@ -4,7 +4,7 @@ local M = {
 
 function M.setup(user_config)
     M.data = {
-        storage_dir = "",                                            -- default vim.fn.stdpath("data").."/bookmarks",
+        storage_dir = "", -- default vim.fn.stdpath("data").."/bookmarks",
         mappings_enabled = true,
         keymap = {
             toggle = "<tab><tab>",                                   -- toggle bookmarks
@@ -32,7 +32,7 @@ function M.setup(user_config)
 
     if user_config ~= nil and type(user_config) == "table" then
         for dk, dv in pairs(M.data) do
-            if type(dv) ~= "table" then
+            if type(dv) ~= "table" or dk == 'virt_pattern' then
                 if user_config[dk] ~= nil then
                     M.data[dk] = user_config[dk]
                 end
