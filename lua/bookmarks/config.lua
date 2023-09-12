@@ -18,6 +18,7 @@ function M.setup(user_config)
         width = 0.8,                                                 -- bookmarks window width:  (0, 1]
         height = 0.7,                                                -- bookmarks window height: (0, 1]
         preview_ratio = 0.45,                                        -- bookmarks preview window ratio (0.1]
+        tags_ratio = 0.1,
         preview_ext_enable = false,                                  -- if true, preview buf will add file ext, preview window may be highlighed(treesitter), but may be slower
         fix_enable = false,
         virt_text = "🔖",                                          -- Show virt text at the end of bookmarked lines

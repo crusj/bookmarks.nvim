@@ -12,6 +12,31 @@ function M.setup()
     float.setup()
 end
 
+-- calculate window size.
+local function calculate_window_size()
+    local ew = api.nvim_get_option("columns")
+    local eh = api.nvim_get_option("lines")
+    local width = math.floor(ew * config.width)
+    local height = math.floor(eh * config.height)
+    -- tags
+    local tw = math.floor(width * config.tags_ratio)
+    local th = height
+    local trow = math.floor((eh - height) / 2)
+    local tcol = math.floor((ew - width) / 2)
+    -- bookmarks
+    local bw = math.floor(width * (1 - config.preview_ratio - config.tags_ratio))
+    local bh = height
+    local brow = trow
+    local bcol = tw + tcol + 2
+    -- preview
+    local pw = math.floor(width - tw - bw)
+    local ph = height
+    local prow = trow
+    local pcol = bcol + bw + 2
+
+    return tw, th, trow, tcol, bw, bh, brow, bcol, pw, ph, prow, pcol
+end
+
 local function bookmarks_autocmd(buffer)
     data.event1 = api.nvim_create_autocmd({ "CursorMoved" }, {
         callback = function()
@@ -37,6 +62,7 @@ local function bookmarks_autocmd(buffer)
     data.event2 = api.nvim_create_autocmd({ "WinClosed" }, {
         callback = function()
             M.close_bookmarks()
+            M.close_tags()
         end,
         buffer = buffer,
     })
@@ -46,6 +72,20 @@ local function bookmarks_preview_autocmd(buffer)
     data.event3 = api.nvim_create_autocmd({ "WinClosed" }, {
         callback = function()
             if data.bufb ~= nil and api.nvim_buf_is_valid(data.bufb) then
+                M.close_bookmarks()
+                M.close_tags()
+            end
+        end,
+        buffer = buffer,
+    })
+end
+
+local function tags_autocmd(buffer)
+    data.event3 = api.nvim_create_autocmd({ "WinClosed" }, {
+        callback = function()
+            if data.bufb ~= nil and api.nvim_buf_is_valid(data.buft) then
+                M.close_tags()
+                M.close_preview()
                 M.close_bookmarks()
             end
         end,
@@ -57,33 +97,25 @@ function M.open_bookmarks()
     data.buff = api.nvim_get_current_buf()
     data.bufw = api.nvim_get_current_win()
 
-    local ew = api.nvim_get_option("columns")
-    local eh = api.nvim_get_option("lines")
-
-
-    local width = math.floor(ew * config.width)
-    local height = math.floor(eh * config.height)
-
-    data.bw = math.floor(width * (1 - config.preview_ratio))
-    data.bh = height
+    local _, _, _, _, w, h, wrow, wcol, _, _, _, _ = calculate_window_size()
+    data.bw = w
+    data.bh = h
 
     local options = {
-        width = data.bw,
-        height = data.bh,
+        width = w,
+        height = h,
         title = "",
-        row = math.floor((eh - height) / 2),
-        col = math.floor((ew - width) / 2),
+        row = wrow,
+        col = wcol,
         relative = "editor",
         border_highlight = config.hl.border,
     }
-
     local pair = float.create_win(options)
     data.bufb = pair.buf
     data.bufbw = pair.win
-
     data.bufbb = float.create_border(options).buf
-
     api.nvim_buf_set_option(data.bufb, 'filetype', 'bookmarks')
+
     local map_opts = { buffer = data.bufb, silent = true }
     vim.keymap.set("n", config.keymap.jump, require("bookmarks").jump, map_opts)
     vim.keymap.set("n", config.keymap.delete, require("bookmarks").delete, map_opts)
@@ -94,6 +126,7 @@ function M.open_bookmarks()
     api.nvim_win_set_option(data.bufbw, "winhighlight", 'Normal:normal,CursorLine:' .. data.hl_cursorline_name)
     api.nvim_set_current_win(data.bufbw)
 
+    M.open_tags()
     bookmarks_autocmd(data.bufb)
 end
 
@@ -129,16 +162,71 @@ function M.close_bookmarks()
     end
 
     M.close_preview()
+    M.close_tags()
+end
+
+-- open tags window
+function M.open_tags()
+    local w, h, wr, wc, _, _, _, _, _, _, _, _ = calculate_window_size()
+    local options = {
+        width = w,
+        height = h,
+        title = "Tags",
+        row = wr,
+        col = wc,
+        relative = "editor",
+        border_highlight = config.hl.border,
+    }
+    local pair = float.create_win(options)
+    tags_autocmd(pair.buf)
+    data.buft = pair.buf
+    data.buftw = pair.win
+    data.buftb = float.create_border(options).buf
+    api.nvim_buf_set_option(pair.buf, 'filetype', 'btags')
+    M.write_tags()
+end
+
+-- close tags window
+function M.close_tags()
+    if data.buft == nil then
+        return
+    end
+
+    if api.nvim_buf_is_valid(data.buft) then
+        api.nvim_buf_delete(data.buft, {})
+    end
+
+    data.buft = nil
+    M.close_tags_border()
+end
+
+function M.close_tags_border()
+    if data.buftb == nil then
+        return
+    end
+
+    if api.nvim_buf_is_valid(data.buftb) then
+        vim.cmd(string.format("bwipeout! %d", data.buftb))
+    end
+
+    data.buftb = nil
+end
+
+function M.write_tags()
+    api.nvim_buf_set_option(data.buft, "modifiable", true)
+    -- empty
+    api.nvim_buf_set_lines(data.buft, 0, -1, false, {})
+    -- flush
+    local lines = {}
+    lines[#lines + 1] = "ALL"
+
+    api.nvim_buf_set_lines(data.buft, 0, #lines, false, lines)
+    api.nvim_buf_set_option(data.buft, "modifiable", false)
 end
 
 -- open preview window
 function M.preview_bookmark(filename, lineNumber)
-    local ew = api.nvim_get_option("columns")
-    local eh = api.nvim_get_option("lines")
-
-    local width = math.floor(ew * config.width)
-    local height = math.floor(eh * config.height)
-    local pw = math.floor(ew * config.width - data.bw)
+    local _, _, _, _, _, _, _, _, w, h, pr, pc = calculate_window_size()
 
     local title = "Nothing to preview"
     if filename ~= nil then
@@ -147,11 +235,11 @@ function M.preview_bookmark(filename, lineNumber)
     end
 
     local options = {
-        width = pw,
-        height = height,
+        width = w,
+        height = h,
         title = title,
-        row = math.floor((eh - height) / 2 + height - data.bh),
-        col = math.floor((ew - width) / 2 + data.bw + 2),
+        row = pr,
+        col = pc,
         relative = "editor",
         border_highlight = config.hl.border,
     }

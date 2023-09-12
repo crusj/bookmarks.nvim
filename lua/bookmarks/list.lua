@@ -57,16 +57,24 @@ end
 function M.add(filename, line, line_md5, description, rows)
     local id = md5.sumhexa(string.format("%s:%s", filename, line))
     local now = os.time()
+    local cuts = description:split_b(":")
+    local tags = ""
+    if #cuts > 1 then
+        tags = cuts[1]
+        description = string.sub(description, #tags + 2)
+    end
 
     if data.bookmarks[id] ~= nil then --update description
         if description ~= nil then
             data.bookmarks[id].description = description
             data.bookmarks[id].updated_at = now
+            data.bookmarks[id].tags = tags
         end
     else -- new
         data.bookmarks[id] = {
             filename = filename,
             id = id,
+            tags = tags,
             line = line,
             description = description or "",
             updated_at = now,
@@ -142,8 +150,8 @@ function M.flush()
     -- order
     local tmp_data = {}
 
-    for _, item in pairs(data.bookmarks) do
-        tmp_data[#tmp_data + 1] = item
+    for _, item in pairs(data.bookmarks_groupby_tags[data.current_tags]) do
+        tmp_data[#tmp_data + 1] = data.bookmarks[item]
     end
 
     -- sort list by time or frequery.
@@ -349,8 +357,20 @@ function M.load(item)
     if data.bookmarks_groupby_filename[item.filename] == nil then
         data.bookmarks_groupby_filename[item.filename] = {}
     end
-
     data.bookmarks_groupby_filename[item.filename][#data.bookmarks_groupby_filename[item.filename] + 1] = item.id
+
+    if data.bookmarks_groupby_tags["ALL"] == nil then
+        data.bookmarks_groupby_tags["ALL"] = {}
+    end
+    data.bookmarks_groupby_tags["ALL"][#data.bookmarks_groupby_tags["ALL"] + 1] = item.id
+
+    if item.tags ~= nil and item.tags ~= "" then
+        print(item.tags)
+        if data.bookmarks_groupby_tags[item.tags] == nil then
+            data.bookmarks_groupby_tags[item.tags] = {}
+        end
+        data.bookmarks_groupby_tags[item.tags][#data.bookmarks_groupby_tags[item.tags] + 1] = item.id
+    end
 end
 
 -- Character alignment.
