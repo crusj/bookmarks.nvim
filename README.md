@@ -163,7 +163,7 @@ Tags is now supported to categorize bookmarks. You can add tags to your bookmark
 
 By default, ALL bookmarks are marked as ALL tags.
 
-You can use the shortcut keys <c-j> and <c-k> to jump through the Tags window and the bookmarks window.
+You can use the shortcut keys `<c-j>` and `<c-k>` to jump through the Tags window and the bookmarks window.
 
 ## Issue
 
