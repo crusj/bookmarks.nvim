@@ -156,6 +156,15 @@ require("bookmarks").setup({
 | ----------------------- | -------------------------------------- |
 | bookmarks_virt_text     | Highlight of the virt_text             |
 
+## Tags
+Tags is now supported to categorize bookmarks. You can add tags to your bookmarks by using semicolons when you add them.
+
+<img src="https://github.com/crusj/bookmarks.nvim/blob/main/screenshots/shot3.png" width="750">
+
+By default, ALL bookmarks are marked as ALL tags.
+
+You can use the shortcut keys <c-j> and <c-k> to jump through the Tags window and the bookmarks window.
+
 ## Issue
 
 Bookmark are realized by storing the file name and line number where the bookmark is added.<br>
