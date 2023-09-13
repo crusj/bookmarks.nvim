@@ -5,6 +5,7 @@ local M = {
     bookmarks_groupby_tags = {},     -- group bookmarks by tags
     bookmarks_order = "time",
     current_tags = "ALL",            -- current  tags
+    tags = {},
 
     cwd = nil,
     data_filename = nil,

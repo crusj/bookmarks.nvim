@@ -125,6 +125,12 @@ function M.open_bookmarks()
     api.nvim_win_set_option(data.bufbw, "wrap", false)
     api.nvim_win_set_option(data.bufbw, "winhighlight", 'Normal:normal,CursorLine:' .. data.hl_cursorline_name)
     api.nvim_set_current_win(data.bufbw)
+    vim.keymap.set(
+        "n",
+        "<c-j>",
+        function() api.nvim_set_current_win(data.buftw) end,
+        { silent = true, noremap = true, buffer = data.buft }
+    )
 
     M.open_tags()
     bookmarks_autocmd(data.bufb)
@@ -183,6 +189,24 @@ function M.open_tags()
     data.buftw = pair.win
     data.buftb = float.create_border(options).buf
     api.nvim_buf_set_option(pair.buf, 'filetype', 'btags')
+    vim.keymap.set(
+        "n",
+        "<2-LeftMouse>",
+        function() M.change_tags() end,
+        { silent = true, noremap = true, buffer = data.buft }
+    )
+    vim.keymap.set(
+        "n",
+        "<CR>",
+        function() M.change_tags() end,
+        { silent = true, noremap = true, buffer = data.buft }
+    )
+    vim.keymap.set(
+        "n",
+        "<c-k>",
+        function() api.nvim_set_current_win(data.bufbw) end,
+        { silent = true, noremap = true, buffer = data.buft }
+    )
     M.write_tags()
 end
 
@@ -217,11 +241,31 @@ function M.write_tags()
     -- empty
     api.nvim_buf_set_lines(data.buft, 0, -1, false, {})
     -- flush
-    local lines = {}
-    lines[#lines + 1] = "ALL"
+    local tags_list = {}
+    for tags, _ in pairs(data.bookmarks_groupby_tags) do
+        if tags ~= "ALL" then
+            tags_list[#tags_list + 1] = tags
+        end
+    end
+    table.sort(tags_list)
 
-    api.nvim_buf_set_lines(data.buft, 0, #lines, false, lines)
+    data.tags = {}
+    data.tags[#data.tags + 1] = "ALL"
+    for _, value in pairs(tags_list) do
+        data.tags[#data.tags + 1] = value
+    end
+
+    api.nvim_buf_set_lines(data.buft, 0, -1, false, {})
+    api.nvim_buf_set_lines(data.buft, 0, #data.tags, false, data.tags)
+    api.nvim_win_set_option(data.buftw, "winhighlight", 'Normal:normal,CursorLine:' .. data.hl_cursorline_name)
+    api.nvim_win_set_option(data.buftw, "cursorline", true)
     api.nvim_buf_set_option(data.buft, "modifiable", false)
+end
+
+function M.change_tags()
+    local line = vim.fn.line('.')
+    data.current_tags = data.tags[line]
+    require("bookmarks.list").refresh(false)
 end
 
 -- open preview window

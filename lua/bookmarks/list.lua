@@ -88,6 +88,15 @@ function M.add(filename, line, line_md5, description, rows)
         else
             data.bookmarks_groupby_filename[filename][#data.bookmarks_groupby_filename[filename] + 1] = id
         end
+
+        data.bookmarks_groupby_tags["ALL"][#data.bookmarks_groupby_tags["ALL"] + 1] = id
+        if tags ~= "" then
+            if data.bookmarks_groupby_tags[tags] == nil then
+                data.bookmarks_groupby_tags[tags] = { id }
+            else
+                data.bookmarks_groupby_tags[tags][#data.bookmarks_groupby_tags[tags] + 1] = id
+            end
+        end
     end
 end
 
@@ -114,7 +123,15 @@ end
 -- Delete bookmark.
 function M.delete(line)
     if data.bookmarks_order_ids[line] ~= nil then
+        local tags = data.bookmarks[data.bookmarks_order_ids[line]].tags
+        if tags ~= "" then
+            if data.bookmarks_groupby_tags[tags] ~= nil and #data.bookmarks_groupby_tags[tags] == 1 then
+                data.bookmarks_groupby_tags[tags] = nil
+                data.current_tags = "ALL"
+            end
+        end
         data.bookmarks[data.bookmarks_order_ids[line]] = nil
+        w.write_tags()
         M.refresh()
     end
 end
@@ -196,6 +213,7 @@ function M.flush()
     -- flush
     api.nvim_buf_set_lines(data.bufb, 0, #lines, false, lines)
     api.nvim_buf_set_option(data.bufb, "modifiable", false)
+    api.nvim_set_current_win(data.bufbw)
 end
 
 -- Ui: Align bookmarks display
@@ -365,7 +383,6 @@ function M.load(item)
     data.bookmarks_groupby_tags["ALL"][#data.bookmarks_groupby_tags["ALL"] + 1] = item.id
 
     if item.tags ~= nil and item.tags ~= "" then
-        print(item.tags)
         if data.bookmarks_groupby_tags[item.tags] == nil then
             data.bookmarks_groupby_tags[item.tags] = {}
         end
