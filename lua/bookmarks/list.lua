@@ -166,9 +166,10 @@ end
 function M.flush()
     -- order
     local tmp_data = {}
-
-    for _, item in pairs(data.bookmarks_groupby_tags[data.current_tags]) do
-        tmp_data[#tmp_data + 1] = data.bookmarks[item]
+    if data.bookmarks_groupby_tags[data.current_tags] ~= nil then
+        for _, item in pairs(data.bookmarks_groupby_tags[data.current_tags]) do
+            tmp_data[#tmp_data + 1] = data.bookmarks[item]
+        end
     end
 
     -- sort list by time or frequery.
