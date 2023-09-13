@@ -260,9 +260,17 @@ function M.write_tags()
         end
         data.tags[#data.tags + 1] = value
     end
+    local show_tags = {}
+    for i, value in pairs(data.tags) do
+        if i == current_line then
+            show_tags[#show_tags + 1] = string.format("󰁕 %s", value)
+        else
+            show_tags[#show_tags + 1] = string.format("  %s", value)
+        end
+    end
 
     api.nvim_buf_set_lines(data.buft, 0, -1, false, {})
-    api.nvim_buf_set_lines(data.buft, 0, #data.tags, false, data.tags)
+    api.nvim_buf_set_lines(data.buft, 0, #show_tags, false, show_tags)
     api.nvim_win_set_option(data.buftw, "winhighlight", 'Normal:normal,CursorLine:' .. data.hl_cursorline_name)
     api.nvim_win_set_option(data.buftw, "cursorline", true)
     api.nvim_buf_set_option(data.buft, "modifiable", false)
@@ -273,6 +281,7 @@ end
 function M.change_tags()
     local line = vim.fn.line('.')
     data.current_tags = data.tags[line]
+    M.write_tags()
     require("bookmarks.list").refresh(false)
 end
 
