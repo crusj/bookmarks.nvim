@@ -44,8 +44,10 @@ local function bookmarks_autocmd(buffer)
             local item = data.bookmarks[data.bookmarks_order_ids[line]] or {}
 
             local bookmarks_len = 0
-            for _, _ in pairs(data.bookmarks) do
-                bookmarks_len = bookmarks_len + 1
+            if data.bookmarks_groupby_tags[data.current_tags] ~= nil then
+                for _, _ in pairs(data.bookmarks_groupby_tags[data.current_tags]) do
+                    bookmarks_len = bookmarks_len + 1
+                end
             end
 
             local cur_line = line
@@ -249,9 +251,13 @@ function M.write_tags()
     end
     table.sort(tags_list)
 
+    local current_line = 1;
     data.tags = {}
     data.tags[#data.tags + 1] = "ALL"
-    for _, value in pairs(tags_list) do
+    for i, value in pairs(tags_list) do
+        if data.current_tags == value then
+            current_line = i + 1
+        end
         data.tags[#data.tags + 1] = value
     end
 
@@ -259,6 +265,8 @@ function M.write_tags()
     api.nvim_buf_set_lines(data.buft, 0, #data.tags, false, data.tags)
     api.nvim_win_set_option(data.buftw, "winhighlight", 'Normal:normal,CursorLine:' .. data.hl_cursorline_name)
     api.nvim_win_set_option(data.buftw, "cursorline", true)
+    api.nvim_buf_set_option(data.buft, "modifiable", false)
+    api.nvim_win_set_cursor(data.buftw, { current_line, 0 })
     api.nvim_buf_set_option(data.buft, "modifiable", false)
 end
 

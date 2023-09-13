@@ -90,8 +90,10 @@ function M.add(filename, line, line_md5, description, rows)
         end
 
         if data.bookmarks_groupby_tags["ALL"] == nil then
-            data.bookmarks_groupby_tags["ALL"] = { id }
+            data.bookmarks_groupby_tags["ALL"] = {}
         end
+        data.bookmarks_groupby_tags["ALL"][#data.bookmarks_groupby_tags["ALL"] + 1] = id
+
         if tags ~= "" then
             if data.bookmarks_groupby_tags[tags] == nil then
                 data.bookmarks_groupby_tags[tags] = { id }
@@ -130,6 +132,18 @@ function M.delete(line)
             if data.bookmarks_groupby_tags[tags] ~= nil and #data.bookmarks_groupby_tags[tags] == 1 then
                 data.bookmarks_groupby_tags[tags] = nil
                 data.current_tags = "ALL"
+            else
+                for i, each in pairs(data.bookmarks_groupby_tags[tags]) do
+                    if each == data.bookmarks_order_ids[line] then
+                        data.bookmarks_groupby_tags[tags][i] = nil
+                    end
+                end
+            end
+
+            for i, each in pairs(data.bookmarks_groupby_tags["ALL"]) do
+                if each == data.bookmarks_order_ids[line] then
+                    data.bookmarks_groupby_tags["ALL"][i] = nil
+                end
             end
         end
         data.bookmarks[data.bookmarks_order_ids[line]] = nil
