@@ -89,7 +89,9 @@ function M.add(filename, line, line_md5, description, rows)
             data.bookmarks_groupby_filename[filename][#data.bookmarks_groupby_filename[filename] + 1] = id
         end
 
-        data.bookmarks_groupby_tags["ALL"][#data.bookmarks_groupby_tags["ALL"] + 1] = id
+        if data.bookmarks_groupby_tags["ALL"] == nil then
+            data.bookmarks_groupby_tags["ALL"] = { id }
+        end
         if tags ~= "" then
             if data.bookmarks_groupby_tags[tags] == nil then
                 data.bookmarks_groupby_tags[tags] = { id }
