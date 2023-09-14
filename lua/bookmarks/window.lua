@@ -131,7 +131,7 @@ function M.open_bookmarks()
         "n",
         "<c-j>",
         function() api.nvim_set_current_win(data.buftw) end,
-        { silent = true, noremap = true, buffer = data.buft }
+        { silent = true, noremap = true, buffer = data.bufb }
     )
 
     M.open_tags()
