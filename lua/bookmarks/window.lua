@@ -285,6 +285,34 @@ function M.change_tags()
     require("bookmarks.list").refresh(false)
 end
 
+function M.delete_tags(line)
+    local tags = data.bookmarks[data.bookmarks_order_ids[line]].tags
+    if tags ~= "" then
+        if data.bookmarks_groupby_tags[tags] ~= nil then
+            -- set nil
+            if #data.bookmarks_groupby_tags[tags] == 1 then
+                data.bookmarks_groupby_tags[tags] = nil
+                data.current_tags = "ALL"
+            else
+                -- remove from tags list
+                for i, each in pairs(data.bookmarks_groupby_tags[tags]) do
+                    if each == data.bookmarks_order_ids[line] then
+                        data.bookmarks_groupby_tags[tags][i] = nil
+                    end
+                end
+            end
+        end
+
+        -- remove from ALL tags list.
+        for i, each in pairs(data.bookmarks_groupby_tags["ALL"]) do
+            if each == data.bookmarks_order_ids[line] then
+                data.bookmarks_groupby_tags["ALL"][i] = nil
+            end
+        end
+    end
+    data.bookmarks[data.bookmarks_order_ids[line]] = nil
+end
+
 -- open preview window
 function M.preview_bookmark(filename, lineNumber)
     local _, _, _, _, _, _, _, _, w, h, pr, pc = calculate_window_size()

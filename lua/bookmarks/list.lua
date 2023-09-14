@@ -127,26 +127,7 @@ end
 -- Delete bookmark.
 function M.delete(line)
     if data.bookmarks_order_ids[line] ~= nil then
-        local tags = data.bookmarks[data.bookmarks_order_ids[line]].tags
-        if tags ~= "" then
-            if data.bookmarks_groupby_tags[tags] ~= nil and #data.bookmarks_groupby_tags[tags] == 1 then
-                data.bookmarks_groupby_tags[tags] = nil
-                data.current_tags = "ALL"
-            else
-                for i, each in pairs(data.bookmarks_groupby_tags[tags]) do
-                    if each == data.bookmarks_order_ids[line] then
-                        data.bookmarks_groupby_tags[tags][i] = nil
-                    end
-                end
-            end
-
-            for i, each in pairs(data.bookmarks_groupby_tags["ALL"]) do
-                if each == data.bookmarks_order_ids[line] then
-                    data.bookmarks_groupby_tags["ALL"][i] = nil
-                end
-            end
-        end
-        data.bookmarks[data.bookmarks_order_ids[line]] = nil
+        w.delete_tags(line)
         w.write_tags()
         M.refresh()
     end
