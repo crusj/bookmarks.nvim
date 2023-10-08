@@ -43,8 +43,11 @@ local M = {
 
     hl_cursorline_name = "hl_bookmarks_csl",
 
-    event1 = nil, -- bookmarks Cursormoved
-    event2 = nil, -- bookmarks BufWinLeave
+    event1 = nil,
+    event2 = nil,
+    event3 = nil,
+    event4 = nil,
+    event5 = nil,
 
     last_win = nil,
     last_buf = nil,

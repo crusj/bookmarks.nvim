@@ -211,7 +211,6 @@ function M.flush()
     -- flush
     api.nvim_buf_set_lines(data.bufb, 0, #lines, false, lines)
     api.nvim_buf_set_option(data.bufb, "modifiable", false)
-    api.nvim_set_current_win(data.bufbw)
 end
 
 -- Ui: Align bookmarks display

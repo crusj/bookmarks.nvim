@@ -93,6 +93,29 @@ local function tags_autocmd(buffer)
         end,
         buffer = buffer,
     })
+    data.event5 = api.nvim_create_autocmd({ "CursorMoved" }, {
+        callback = function()
+            M.change_tags()
+            local line = 1
+            local item = data.bookmarks[data.bookmarks_order_ids[line]] or {}
+
+            local bookmarks_len = 0
+            if data.bookmarks_groupby_tags[data.current_tags] ~= nil then
+                for _, _ in pairs(data.bookmarks_groupby_tags[data.current_tags]) do
+                    bookmarks_len = bookmarks_len + 1
+                end
+            end
+
+            local cur_line = line
+            if bookmarks_len == 0 then
+                cur_line = 0
+            end
+
+            M.set_title(data.bufbb, string.format("Bookmarks[%d/%d]", cur_line, bookmarks_len), data.bw)
+            M.preview_bookmark(item.filename, item.line)
+        end,
+        buffer = buffer
+    })
 end
 
 function M.open_bookmarks()
@@ -127,15 +150,19 @@ function M.open_bookmarks()
     api.nvim_win_set_option(data.bufbw, "wrap", false)
     api.nvim_win_set_option(data.bufbw, "winhighlight", 'Normal:normal,CursorLine:' .. data.hl_cursorline_name)
     api.nvim_set_current_win(data.bufbw)
+    bookmarks_autocmd(data.bufb)
+
+    M.open_tags()
     vim.keymap.set(
         "n",
         "<c-j>",
-        function() api.nvim_set_current_win(data.buftw) end,
+        function()
+            if api.nvim_win_is_valid(data.buftw) then
+                api.nvim_set_current_win(data.buftw)
+            end
+        end,
         { silent = true, noremap = true, buffer = data.bufb }
     )
-
-    M.open_tags()
-    bookmarks_autocmd(data.bufb)
 end
 
 function M.set_title(b, title, width)
@@ -194,13 +221,19 @@ function M.open_tags()
     vim.keymap.set(
         "n",
         "<2-LeftMouse>",
-        function() M.change_tags() end,
+        function()
+            M.change_tags()
+            api.nvim_set_current_win(data.bufbw)
+        end,
         { silent = true, noremap = true, buffer = data.buft }
     )
     vim.keymap.set(
         "n",
         "<CR>",
-        function() M.change_tags() end,
+        function()
+            M.change_tags()
+            api.nvim_set_current_win(data.bufbw)
+        end,
         { silent = true, noremap = true, buffer = data.buft }
     )
     vim.keymap.set(
@@ -271,11 +304,10 @@ function M.write_tags()
 
     api.nvim_buf_set_lines(data.buft, 0, -1, false, {})
     api.nvim_buf_set_lines(data.buft, 0, #show_tags, false, show_tags)
+    api.nvim_buf_set_option(data.buft, "modifiable", false)
     api.nvim_win_set_option(data.buftw, "winhighlight", 'Normal:normal,CursorLine:' .. data.hl_cursorline_name)
     api.nvim_win_set_option(data.buftw, "cursorline", true)
-    api.nvim_buf_set_option(data.buft, "modifiable", false)
     api.nvim_win_set_cursor(data.buftw, { current_line, 0 })
-    api.nvim_buf_set_option(data.buft, "modifiable", false)
 end
 
 function M.change_tags()
