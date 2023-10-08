@@ -83,7 +83,7 @@ local function bookmarks_preview_autocmd(buffer)
 end
 
 local function tags_autocmd(buffer)
-    data.event3 = api.nvim_create_autocmd({ "WinClosed" }, {
+    data.event4 = api.nvim_create_autocmd({ "WinClosed" }, {
         callback = function()
             if data.bufb ~= nil and api.nvim_buf_is_valid(data.buft) then
                 M.close_tags()
