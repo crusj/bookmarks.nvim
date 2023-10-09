@@ -393,16 +393,17 @@ function M.preview_bookmark(filename, lineNumber)
         api.nvim_buf_set_option(data.bufp, "modifiable", true)
         api.nvim_buf_set_lines(data.bufp, 0, -1, false, {})
         api.nvim_buf_set_lines(data.bufp, 0, #lines, false, lines)
+
         vim.schedule(function()
             local cuts = filename:split_b(".")
             local ext = cuts[#cuts]
             if #cuts > 1 and ext ~= "" then
-                api.nvim_buf_set_option(data.bufp, "filetype", ext)
+                api.nvim_buf_set_option(data.bufp, "syntax", ext)
+                vim.treesitter.start(data.bufp, ext)
             end
         end)
 
         local cw = api.nvim_get_current_win()
-
         api.nvim_win_set_option(data.bufpw, "cursorline", true)
         api.nvim_win_set_option(data.bufpw, "number", true)
         api.nvim_win_set_option(data.bufpw, "winhighlight", 'Normal:normal')
