@@ -146,6 +146,7 @@ function M.open_bookmarks()
 
     local map_opts = { buffer = data.bufb, silent = true }
     vim.keymap.set("n", config.keymap.jump, require("bookmarks").jump, map_opts)
+    vim.keymap.set("n", "<2-LeftMouse>", require("bookmarks").jump, map_opts)
     vim.keymap.set("n", config.keymap.delete, require("bookmarks").delete, map_opts)
     vim.keymap.set("n", config.keymap.order, function() require("bookmarks.list").refresh(true) end, map_opts)
 
