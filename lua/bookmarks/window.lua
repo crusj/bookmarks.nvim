@@ -349,6 +349,19 @@ function M.delete_tags(line)
     data.bookmarks[data.bookmarks_order_ids[line]] = nil
 end
 
+function M.regroup_tags(tags)
+    local new_tags_group = {}
+    local all_tags_group = {}
+    for _, each in pairs(data.bookmarks) do
+        all_tags_group[#all_tags_group + 1] = each.id
+        if each.tags == tags then
+            new_tags_group[#new_tags_group + 1] = each.id
+        end
+    end
+    data.bookmarks_groupby_tags[tags] = new_tags_group
+    data.bookmarks_groupby_tags["ALL"] = all_tags_group
+end
+
 -- open preview window
 function M.preview_bookmark(filename, lineNumber)
     local _, _, _, _, _, _, _, _, w, h, pr, pc = calculate_window_size()

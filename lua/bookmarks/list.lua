@@ -140,6 +140,7 @@ function M.delete_on_virt()
     for k, v in pairs(data.bookmarks) do
         if v.line == line and file_name == v.filename then
             data.bookmarks[k] = nil
+            w.regroup_tags(v.tags)
             m.set_marks(0, M.get_buf_bookmark_lines(0))
             return
         end
