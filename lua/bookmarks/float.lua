@@ -120,6 +120,10 @@ function M.create_win(opts)
     opts.row = opts.row or default_opts.row
     opts.col = opts.col or default_opts.col
     opts.relative = opts.relative or "editor"
+
+    if opts.focusable == nil then
+        opts.focusable = true
+    end
     if opts.border == nil then
         opts.border = default_opts.border
     end
@@ -131,7 +135,7 @@ function M.create_win(opts)
         opts.width,
         opts.height,
         opts.relative,
-        true,
+        opts.focusable,
         256
     )
 

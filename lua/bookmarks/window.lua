@@ -95,6 +95,9 @@ local function tags_autocmd(buffer)
     })
     data.event5 = api.nvim_create_autocmd({ "CursorMoved" }, {
         callback = function()
+            if data.bufb == nil or not api.nvim_buf_is_valid(data.bufb) then
+                return
+            end
             M.change_tags()
             local line = 1
             local item = data.bookmarks[data.bookmarks_order_ids[line]] or {}
@@ -363,6 +366,7 @@ function M.preview_bookmark(filename, lineNumber)
         col = pc,
         relative = "editor",
         border_highlight = config.hl.border,
+        focusable = false,
     }
 
     if data.bufp == nil then
@@ -379,7 +383,7 @@ function M.preview_bookmark(filename, lineNumber)
     M.set_title(data.bufbp, options.title, options.width)
 
     if filename ~= nil then
-        local lines = helper.read_all_file(filename)
+        local lines, relative_line_number = helper.read_preview_content(filename, h, lineNumber)
         if lines == nil then
             return
         end
@@ -406,11 +410,9 @@ function M.preview_bookmark(filename, lineNumber)
         api.nvim_win_set_option(data.bufpw, "winhighlight", 'Normal:normal')
 
         api.nvim_set_current_win(data.bufpw)
-        if lineNumber <= vim.fn.line("$") then
-            api.nvim_win_set_cursor(data.bufpw, { lineNumber, 0 })
+        if relative_line_number <= h then
+            api.nvim_win_set_cursor(data.bufpw, { relative_line_number, 0 })
         end
-
-        vim.fn.execute("normal! zz")
 
         api.nvim_set_current_win(cw)
     else
