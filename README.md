@@ -121,7 +121,7 @@ require("bookmarks").setup({
     tags_ratio = 0.1, -- Bookmarks tags window ratio
     fix_enable = false, -- If true, when saving the current file, if the bookmark line number of the current file changes, try to fix it.
 
-    virt_text = "🔖", -- Show virt text at the end of bookmarked lines
+    virt_text = "🔖", -- Show virt text at the end of bookmarked lines, if it is empty, use the description of bookmarks instead.
     virt_pattern = { "*.go", "*.lua", "*.sh", "*.php", "*.rs" }, -- Show virt text only on matched pattern
     border_style = "single", -- border style: "single", "double", "rounded" 
     hl = {
