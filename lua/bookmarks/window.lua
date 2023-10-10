@@ -332,7 +332,7 @@ end
 
 function M.delete_tags(line)
     local tags = data.bookmarks[data.bookmarks_order_ids[line]].tags
-    if tags ~= "" then
+    if tags ~= "" and tags ~= nil then
         if data.bookmarks_groupby_tags[tags] ~= nil then
             -- set nil
             if #data.bookmarks_groupby_tags[tags] == 1 then
@@ -359,6 +359,9 @@ function M.delete_tags(line)
 end
 
 function M.regroup_tags(tags)
+    if tags == nil or tags == "" then
+        return
+    end
     local new_tags_group = {}
     local all_tags_group = {}
     for _, each in pairs(data.bookmarks) do
