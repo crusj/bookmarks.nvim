@@ -98,7 +98,10 @@ local function tags_autocmd(buffer)
             if data.bufb == nil or not api.nvim_buf_is_valid(data.bufb) then
                 return
             end
-            M.change_tags()
+            if not M.change_tags() then
+                return
+            end
+
             local line = 1
             local item = data.bookmarks[data.bookmarks_order_ids[line]] or {}
 
@@ -316,9 +319,15 @@ end
 
 function M.change_tags()
     local line = vim.fn.line('.')
+    if data.current_tags == data.tags[line] then
+        return false
+    end
+
     data.current_tags = data.tags[line]
     M.write_tags()
     require("bookmarks.list").refresh(false)
+
+    return true
 end
 
 function M.delete_tags(line)

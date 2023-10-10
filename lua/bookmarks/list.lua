@@ -211,6 +211,7 @@ function M.flush()
     api.nvim_buf_set_lines(data.bufb, 0, -1, false, {})
     -- flush
     api.nvim_buf_set_lines(data.bufb, 0, #lines, false, lines)
+    api.nvim_win_set_cursor(data.bufbw, { 1, 0 })
     api.nvim_buf_set_option(data.bufb, "modifiable", false)
 end
 
