@@ -219,6 +219,7 @@ function M.padding(str, len)
     local tmp = M.characters(str, 2)
     if tmp > len then
         return string.sub(str, 0, len)
+        -- return require("utf8").sub(str, 0, len)
     else
         return str .. string.rep(" ", len - tmp)
     end

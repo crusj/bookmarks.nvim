@@ -22,7 +22,7 @@ local function calculate_window_size()
     local tw = math.floor(width * config.tags_ratio)
     local th = height
     local trow = math.floor((eh - height) / 2)
-    local tcol = math.floor((ew - width) / 2)
+    local tcol = math.floor((ew - width) / 2) - 2
     -- bookmarks
     local bw = math.floor(width * (1 - config.preview_ratio - config.tags_ratio))
     local bh = height
