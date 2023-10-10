@@ -2,6 +2,7 @@ local md5 = require("bookmarks.md5")
 local w = require("bookmarks.window")
 local data = require("bookmarks.data")
 local m = require("bookmarks.marks")
+local utf8 = require("bookmarks.utf8")
 local api = vim.api
 local config
 
@@ -200,7 +201,9 @@ function M.flush()
             rep2 = math.floor(data.bw * 0.4)
         end
 
-        lines[#lines + 1] = string.format("%s %s [%s]", M.padding(item.description, rep1),
+
+        lines[#lines + 1] = string.format("%s %s [%s]",
+            M.padding(string.format("%s|%s", M.padding(tostring(item.line), 3), item.description), rep1),
             M.padding(icon .. " " .. s[#s], rep2), tmp)
         data.bookmarks_order_ids[#data.bookmarks_order_ids + 1] = item.id
         ::continue::
@@ -217,12 +220,38 @@ end
 
 -- Ui: Align bookmarks display
 function M.padding(str, len)
-    local tmp = M.characters(str, 2)
-    if tmp > len then
-        return string.sub(str, 0, len)
-        -- return require("utf8").sub(str, 0, len)
+    local tmp = ""
+    local total_len = 0
+    for _, codepoint in utf8.codes(str) do
+        local char = codepoint
+        if string.len(char) == 1 or char == "…" then
+            total_len = total_len + 1
+        else
+            total_len = total_len + 2
+        end
+    end
+    if total_len > len then
+        local show_len = len - 1
+        local i = 0
+        for _, codepoint in utf8.codes(str) do
+            if i >= show_len then
+                break
+            end
+            local char = codepoint
+            if string.len(char) == 1 then
+                tmp = tmp .. char
+                i = i + 1
+            else
+                if i + 2 > show_len then
+                    break
+                end
+                i = i + 2
+                tmp = tmp .. char
+            end
+        end
+        return tmp .. string.rep("…", len - i)
     else
-        return str .. string.rep(" ", len - tmp)
+        return str .. string.rep(" ", len - total_len)
     end
 end
 
