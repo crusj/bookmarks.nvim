@@ -116,12 +116,12 @@ require("bookmarks").setup({
         show_desc = "\\sd", -- show bookmark desc(global keymap)
     },
     width = 0.8, -- Bookmarks window width:  (0, 1]
-    height = 0.6, -- Bookmarks window height: (0, 1]
-    preview_ratio = 0.4, -- Bookmarks preview window ratio (0, 1]
-    preview_ext_enable = false, -- If true, preview buf will add file ext, preview window may be highlighed(treesitter), but may be slower.
+    height = 0.7, -- Bookmarks window height: (0, 1]
+    preview_ratio = 0.45, -- Bookmarks preview window ratio (0, 1]
+    tags_ratio = 0.1, -- Bookmarks tags window ratio
     fix_enable = false, -- If true, when saving the current file, if the bookmark line number of the current file changes, try to fix it.
 
-    virt_text = "🔖", -- Show virt text at the end of bookmarked lines
+    virt_text = "🔖", -- Show virt text at the end of bookmarked lines, if it is empty, use the description of bookmarks instead.
     virt_pattern = { "*.go", "*.lua", "*.sh", "*.php", "*.rs" }, -- Show virt text only on matched pattern
     border_style = "single", -- border style: "single", "double", "rounded" 
     hl = {
@@ -155,6 +155,15 @@ require("bookmarks").setup({
 | Highlight               | Purpose                                |
 | ----------------------- | -------------------------------------- |
 | bookmarks_virt_text     | Highlight of the virt_text             |
+
+## Tags
+Tags is now supported to categorize bookmarks. You can add tags to your bookmarks by using semicolons when you add them.
+
+<img src="https://github.com/crusj/bookmarks.nvim/blob/main/screenshots/shot3.png" width="750">
+
+By default, ALL bookmarks are marked as ALL tags.
+
+You can use the shortcut keys `<c-j>` and `<c-k>` to jump through the Tags window and the bookmarks window.
 
 ## Issue
 

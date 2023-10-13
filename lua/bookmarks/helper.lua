@@ -20,6 +20,31 @@ local function read_all_file(filename)
     return lines
 end
 
+local function read_preview_content(file_path, window_size, n)
+    local file = io.open(file_path, "r")
+
+    if not file then
+        return
+    end
+
+    local lines = {}
+    for line in file:lines() do
+        table.insert(lines, line)
+    end
+
+    local start_line = math.max(n - math.floor(window_size / 2), 1)
+    local end_line = math.min(start_line + window_size - 1, #lines)
+
+    local content = {}
+    for i = start_line, end_line do
+        table.insert(content, lines[i])
+    end
+
+    file:close()
+
+    return content, n - start_line + 1
+end
+
 local function get_str_common_len(a, b)
     local common_len = 0
     local min = #a
@@ -89,5 +114,7 @@ return {
     get_str_common_len = get_str_common_len,
     get_package_path = get_package_path,
     get_lib = get_lib,
-    get_os_type = get_c_path
+    get_os_type = get_c_path,
+    read_preview_content = read_preview_content,
+    get_str_common_len = get_str_common_len
 }

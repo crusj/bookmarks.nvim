@@ -2,6 +2,7 @@ local w = require("bookmarks.window")
 local data = require("bookmarks.data")
 local m = require("bookmarks.marks")
 local helper = require("bookmarks.helper")
+local utf8 = require("bookmarks.utf8")
 local api = vim.api
 local config
 
@@ -57,16 +58,24 @@ end
 function M.add(filename, line, line_md5, description, rows)
     local id = helper.get_lib().get_md5(string.format("%s:%s", filename, line))
     local now = os.time()
+    local cuts = description:split_b(":")
+    local tags = ""
+    if #cuts > 1 then
+        tags = cuts[1]
+        description = string.sub(description, #tags + 2)
+    end
 
     if data.bookmarks[id] ~= nil then --update description
         if description ~= nil then
             data.bookmarks[id].description = description
             data.bookmarks[id].updated_at = now
+            data.bookmarks[id].tags = tags
         end
     else -- new
         data.bookmarks[id] = {
             filename = filename,
             id = id,
+            tags = tags,
             line = line,
             description = description or "",
             updated_at = now,
@@ -78,6 +87,19 @@ function M.add(filename, line, line_md5, description, rows)
             data.bookmarks_groupby_filename[filename] = { id }
         else
             data.bookmarks_groupby_filename[filename][#data.bookmarks_groupby_filename[filename] + 1] = id
+        end
+
+        if data.bookmarks_groupby_tags["ALL"] == nil then
+            data.bookmarks_groupby_tags["ALL"] = {}
+        end
+        data.bookmarks_groupby_tags["ALL"][#data.bookmarks_groupby_tags["ALL"] + 1] = id
+
+        if tags ~= "" then
+            if data.bookmarks_groupby_tags[tags] == nil then
+                data.bookmarks_groupby_tags[tags] = { id }
+            else
+                data.bookmarks_groupby_tags[tags][#data.bookmarks_groupby_tags[tags] + 1] = id
+            end
         end
     end
 end
@@ -105,7 +127,8 @@ end
 -- Delete bookmark.
 function M.delete(line)
     if data.bookmarks_order_ids[line] ~= nil then
-        data.bookmarks[data.bookmarks_order_ids[line]] = nil
+        w.delete_tags(line)
+        w.write_tags()
         M.refresh()
     end
 end
@@ -117,6 +140,7 @@ function M.delete_on_virt()
     for k, v in pairs(data.bookmarks) do
         if v.line == line and file_name == v.filename then
             data.bookmarks[k] = nil
+            w.regroup_tags(v.tags)
             m.set_marks(0, M.get_buf_bookmark_lines(0))
             return
         end
@@ -140,9 +164,10 @@ end
 function M.flush()
     -- order
     local tmp_data = {}
-
-    for _, item in pairs(data.bookmarks) do
-        tmp_data[#tmp_data + 1] = item
+    if data.bookmarks_groupby_tags[data.current_tags] ~= nil then
+        for _, item in pairs(data.bookmarks_groupby_tags[data.current_tags]) do
+            tmp_data[#tmp_data + 1] = data.bookmarks[item]
+        end
     end
 
     -- sort list by time or frequery.
@@ -175,7 +200,9 @@ function M.flush()
             rep2 = math.floor(data.bw * 0.4)
         end
 
-        lines[#lines + 1] = string.format("%s %s [%s]", M.padding(item.description, rep1),
+
+        lines[#lines + 1] = string.format("%s %s [%s]",
+            M.padding(string.format("%s|%s", M.padding(tostring(item.line), 3), item.description), rep1),
             M.padding(icon .. " " .. s[#s], rep2), tmp)
         data.bookmarks_order_ids[#data.bookmarks_order_ids + 1] = item.id
         ::continue::
@@ -186,16 +213,44 @@ function M.flush()
     api.nvim_buf_set_lines(data.bufb, 0, -1, false, {})
     -- flush
     api.nvim_buf_set_lines(data.bufb, 0, #lines, false, lines)
+    api.nvim_win_set_cursor(data.bufbw, { 1, 0 })
     api.nvim_buf_set_option(data.bufb, "modifiable", false)
 end
 
 -- Ui: Align bookmarks display
 function M.padding(str, len)
-    local tmp = M.characters(str, 2)
-    if tmp > len then
-        return string.sub(str, 0, len)
+    local tmp = ""
+    local total_len = 0
+    for _, codepoint in utf8.codes(str) do
+        local char = codepoint
+        if string.len(char) == 1 or char == "…" then
+            total_len = total_len + 1
+        else
+            total_len = total_len + 2
+        end
+    end
+    if total_len > len then
+        local show_len = len - 1
+        local i = 0
+        for _, codepoint in utf8.codes(str) do
+            if i >= show_len then
+                break
+            end
+            local char = codepoint
+            if string.len(char) == 1 then
+                tmp = tmp .. char
+                i = i + 1
+            else
+                if i + 2 > show_len then
+                    break
+                end
+                i = i + 2
+                tmp = tmp .. char
+            end
+        end
+        return tmp .. string.rep("…", len - i)
     else
-        return str .. string.rep(" ", len - tmp)
+        return str .. string.rep(" ", len - total_len)
     end
 end
 
@@ -348,8 +403,19 @@ function M.load(item)
     if data.bookmarks_groupby_filename[item.filename] == nil then
         data.bookmarks_groupby_filename[item.filename] = {}
     end
-
     data.bookmarks_groupby_filename[item.filename][#data.bookmarks_groupby_filename[item.filename] + 1] = item.id
+
+    if data.bookmarks_groupby_tags["ALL"] == nil then
+        data.bookmarks_groupby_tags["ALL"] = {}
+    end
+    data.bookmarks_groupby_tags["ALL"][#data.bookmarks_groupby_tags["ALL"] + 1] = item.id
+
+    if item.tags ~= nil and item.tags ~= "" then
+        if data.bookmarks_groupby_tags[item.tags] == nil then
+            data.bookmarks_groupby_tags[item.tags] = {}
+        end
+        data.bookmarks_groupby_tags[item.tags][#data.bookmarks_groupby_tags[item.tags] + 1] = item.id
+    end
 end
 
 -- Character alignment.
