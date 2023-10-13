@@ -166,7 +166,9 @@ function M.flush()
     local tmp_data = {}
     if data.bookmarks_groupby_tags[data.current_tags] ~= nil then
         for _, item in pairs(data.bookmarks_groupby_tags[data.current_tags]) do
-            tmp_data[#tmp_data + 1] = data.bookmarks[item]
+            if data.bookmarks[item] ~= nil then
+                tmp_data[#tmp_data + 1] = data.bookmarks[item]
+            end
         end
     end
 

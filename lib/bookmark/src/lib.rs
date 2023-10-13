@@ -30,6 +30,7 @@ struct Item {
     line_md5: String,
     line: i32,
     updated_at: i32,
+    tags: String,
 }
 
 fn get_changes(lua: &Lua, (file_path, bookmarks): (String, LuaTable)) -> LuaResult<Vec<Item>> {
@@ -46,6 +47,7 @@ fn get_changes(lua: &Lua, (file_path, bookmarks): (String, LuaTable)) -> LuaResu
                 line: value.get("line").unwrap(),
                 line_md5: value.get("line_md5").unwrap(),
                 updated_at: value.get("updated_at").unwrap(),
+                tags: value.get("tags").unwrap_or(String::default()),
             };
 
             if v.contains_key(&item.line_md5) {
