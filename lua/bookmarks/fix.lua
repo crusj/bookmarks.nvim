@@ -12,6 +12,18 @@ local function fix_bookmarks()
     local bookmarks = {};
     for _, id in pairs(data.bookmarks_groupby_filename[filename]) do
         bookmarks[#bookmarks + 1] = data.bookmarks[id];
+        if data.bookmarks[id] ~= nil then
+            if data.bookmarks[id].tags ~= nil then
+                for i, tid in pairs(data.bookmarks_groupby_tags[data.bookmarks[id].tags]) do
+                    if tid == id then
+                        -- remove the old bookmark
+                        data.bookmarks_groupby_tags[data.bookmarks[id].tags][i] = nil
+                    end
+                end
+            end
+            -- remove the old bookmark
+            data.bookmarks[id] = nil
+        end
     end
 
     local fixed_bookmarks = helper.get_lib().fix(filename, bookmarks)
@@ -27,6 +39,10 @@ local function fix_bookmarks()
         data.bookmarks[bookmark.id] = bookmark
         data.bookmarks_groupby_filename[bookmark.filename][#data.bookmarks_groupby_filename[bookmark.filename] + 1] =
             bookmark.id
+        -- add a new bookmark
+        if bookmark.tags ~= nil then
+            data.bookmarks_groupby_tags[bookmark.tags][#data.bookmarks_groupby_tags[bookmark.tags] + 1] = bookmark.id
+        end
     end
 end
 
