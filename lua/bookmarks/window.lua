@@ -44,9 +44,13 @@ local function bookmarks_autocmd(buffer)
             local item = data.bookmarks[data.bookmarks_order_ids[line]] or {}
 
             local bookmarks_len = 0
-            if data.bookmarks_groupby_tags[data.current_tags] ~= nil then
-                for _, _ in pairs(data.bookmarks_groupby_tags[data.current_tags]) do
+            for _, each in pairs(data.bookmarks) do
+                if data.current_tags == "ALL" then
                     bookmarks_len = bookmarks_len + 1
+                else
+                    if each.tags == data.current_tags then
+                        bookmarks_len = bookmarks_len + 1
+                    end
                 end
             end
 
@@ -98,6 +102,7 @@ local function tags_autocmd(buffer)
             if data.bufb == nil or not api.nvim_buf_is_valid(data.bufb) then
                 return
             end
+            -- print("Cmd: ", vim.fn.line("."))
             if not M.change_tags() then
                 return
             end
@@ -106,9 +111,13 @@ local function tags_autocmd(buffer)
             local item = data.bookmarks[data.bookmarks_order_ids[line]] or {}
 
             local bookmarks_len = 0
-            if data.bookmarks_groupby_tags[data.current_tags] ~= nil then
-                for _, _ in pairs(data.bookmarks_groupby_tags[data.current_tags]) do
+            for _, each in pairs(data.bookmarks) do
+                if data.current_tags == "ALL" then
                     bookmarks_len = bookmarks_len + 1
+                else
+                    if each.tags == data.current_tags then
+                        bookmarks_len = bookmarks_len + 1
+                    end
                 end
             end
 
@@ -279,31 +288,25 @@ function M.close_tags_border()
 end
 
 function M.write_tags()
+    local line = vim.fn.line(".")
     api.nvim_buf_set_option(data.buft, "modifiable", true)
     -- empty
     api.nvim_buf_set_lines(data.buft, 0, -1, false, {})
-    -- flush
-    local tags_list = {}
-    for tags, _ in pairs(data.bookmarks_groupby_tags) do
-        if tags ~= "ALL" then
-            tags_list[#tags_list + 1] = tags
-        end
-    end
-    table.sort(tags_list)
 
-    local current_line = 1;
-    data.tags = {}
-    data.tags[#data.tags + 1] = "ALL"
-    for i, value in pairs(tags_list) do
-        if data.current_tags == value then
-            current_line = i + 1
-        end
-        data.tags[#data.tags + 1] = value
+    local tags_list = { "ALL" }
+    local tmp_tags_list = data.get_tags()
+    table.sort(tmp_tags_list)
+    for _, value in pairs(tmp_tags_list) do
+        table.insert(tags_list, value)
     end
+
+    -- print("write_tags: ", line)
     local show_tags = {}
-    for i, value in pairs(data.tags) do
-        if i == current_line then
+    local current_line = 1;
+    for i, value in pairs(tags_list) do
+        if i == line then
             show_tags[#show_tags + 1] = string.format("󰁕 %s", value)
+            current_line = i
         else
             show_tags[#show_tags + 1] = string.format("  %s", value)
         end
@@ -318,12 +321,17 @@ function M.write_tags()
 end
 
 function M.change_tags()
-    local line = vim.fn.line('.')
-    if data.current_tags == data.tags[line] then
+    local tags_list = { "ALL" }
+    for _, value in pairs(data.get_tags()) do
+        table.insert(tags_list, value)
+    end
+    local line = vim.fn.line(".")
+    if tags_list[line] == data.current_tags then
         return false
     end
 
-    data.current_tags = data.tags[line]
+    data.current_tags = tags_list[line]
+    -- print("Change_tags: ", line, data.current_tags)
     M.write_tags()
     require("bookmarks.list").refresh(false)
 
@@ -331,47 +339,7 @@ function M.change_tags()
 end
 
 function M.delete_tags(line)
-    local tags = data.bookmarks[data.bookmarks_order_ids[line]].tags
-    if tags ~= "" and tags ~= nil then
-        if data.bookmarks_groupby_tags[tags] ~= nil then
-            -- set nil
-            if #data.bookmarks_groupby_tags[tags] == 1 then
-                data.bookmarks_groupby_tags[tags] = nil
-                data.current_tags = "ALL"
-            else
-                -- remove from tags list
-                for i, each in pairs(data.bookmarks_groupby_tags[tags]) do
-                    if each == data.bookmarks_order_ids[line] then
-                        data.bookmarks_groupby_tags[tags][i] = nil
-                    end
-                end
-            end
-        end
-
-        -- remove from ALL tags list.
-        for i, each in pairs(data.bookmarks_groupby_tags["ALL"]) do
-            if each == data.bookmarks_order_ids[line] then
-                data.bookmarks_groupby_tags["ALL"][i] = nil
-            end
-        end
-    end
     data.bookmarks[data.bookmarks_order_ids[line]] = nil
-end
-
-function M.regroup_tags(tags)
-    if tags == nil or tags == "" then
-        return
-    end
-    local new_tags_group = {}
-    local all_tags_group = {}
-    for _, each in pairs(data.bookmarks) do
-        all_tags_group[#all_tags_group + 1] = each.id
-        if each.tags == tags then
-            new_tags_group[#new_tags_group + 1] = each.id
-        end
-    end
-    data.bookmarks_groupby_tags[tags] = new_tags_group
-    data.bookmarks_groupby_tags["ALL"] = all_tags_group
 end
 
 -- open preview window

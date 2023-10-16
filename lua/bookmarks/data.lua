@@ -1,11 +1,8 @@
 local M = {
-    bookmarks = {},                  -- filename description fre id line updated_at line_md5
-    bookmarks_groupby_filename = {}, -- group bookmarks by filename
+    bookmarks = {}, -- filename description fre id line updated_at line_md5
     bookmarks_order_ids = {},
-    bookmarks_groupby_tags = {},     -- group bookmarks by tags
     bookmarks_order = "time",
-    current_tags = "ALL",            -- current  tags
-    tags = {},
+    current_tags = "ALL", -- current  tags
 
     cwd = nil,
     data_filename = nil,
@@ -52,5 +49,37 @@ local M = {
     last_win = nil,
     last_buf = nil,
 }
+
+function M.get_by_filename(filename)
+    local ret = {}
+    for _, v in pairs(M.bookmarks) do
+        ret[#ret + 1] = v
+    end
+    return ret
+end
+
+function M.get_by_tags(tags)
+    local ret = {}
+    if tags == "ALL" then
+        return M.bookmarks
+    end
+
+    for _, v in pairs(M.bookmarks) do
+        if v.tags == tags then
+            ret[#ret + 1] = v
+        end
+    end
+    return ret
+end
+
+function M.get_tags()
+    local ret = {}
+    for _, v in pairs(M.bookmarks) do
+        if v.tags ~= "" then
+            ret[#ret + 1] = v.tags
+        end
+    end
+    return ret
+end
 
 return M

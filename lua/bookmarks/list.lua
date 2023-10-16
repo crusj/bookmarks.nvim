@@ -82,46 +82,12 @@ function M.add(filename, line, line_md5, description, rows)
             fre = 1,
             line_md5 = line_md5, -- for fix
         }
-
-        if data.bookmarks_groupby_filename[filename] == nil then
-            data.bookmarks_groupby_filename[filename] = { id }
-        else
-            data.bookmarks_groupby_filename[filename][#data.bookmarks_groupby_filename[filename] + 1] = id
-        end
-
-        if data.bookmarks_groupby_tags["ALL"] == nil then
-            data.bookmarks_groupby_tags["ALL"] = {}
-        end
-        data.bookmarks_groupby_tags["ALL"][#data.bookmarks_groupby_tags["ALL"] + 1] = id
-
-        if tags ~= "" then
-            if data.bookmarks_groupby_tags[tags] == nil then
-                data.bookmarks_groupby_tags[tags] = { id }
-            else
-                data.bookmarks_groupby_tags[tags][#data.bookmarks_groupby_tags[tags] + 1] = id
-            end
-        end
     end
 end
 
 function M.get_buf_bookmark_lines(buf)
     local filename = api.nvim_buf_get_name(buf)
-    local lines = {}
-    local group = data.bookmarks_groupby_filename[filename]
-
-    if group == nil then
-        return lines
-    end
-
-    local tmp = {}
-    for _, each in pairs(group) do
-        if data.bookmarks[each] ~= nil and tmp[data.bookmarks[each].line] == nil then
-            lines[#lines + 1] = data.bookmarks[each]
-            tmp[data.bookmarks[each].line] = true
-        end
-    end
-
-    return lines
+    return data.get_by_filename(filename)
 end
 
 -- Delete bookmark.
@@ -140,7 +106,6 @@ function M.delete_on_virt()
     for k, v in pairs(data.bookmarks) do
         if v.line == line and file_name == v.filename then
             data.bookmarks[k] = nil
-            w.regroup_tags(v.tags)
             m.set_marks(0, M.get_buf_bookmark_lines(0))
             return
         end
@@ -164,12 +129,8 @@ end
 function M.flush()
     -- order
     local tmp_data = {}
-    if data.bookmarks_groupby_tags[data.current_tags] ~= nil then
-        for _, item in pairs(data.bookmarks_groupby_tags[data.current_tags]) do
-            if data.bookmarks[item] ~= nil then
-                tmp_data[#tmp_data + 1] = data.bookmarks[item]
-            end
-        end
+    for _, item in pairs(data.get_by_tags(data.current_tags)) do
+        tmp_data[#tmp_data + 1] = item
     end
 
     -- sort list by time or frequery.
@@ -384,15 +345,14 @@ end
 function M.show_desc()
     local line = vim.fn.line(".")
     local filename = api.nvim_buf_get_name(0)
-    local group = data.bookmarks_groupby_filename[filename]
-    if group == nil then
+    local group = data.get_by_filename(filename)
+    if group == nil or #group == 0 then
         return
     end
 
     for _, each in pairs(group) do
-        local bm = data.bookmarks[each]
-        if bm ~= nil and bm.line == line then
-            print(os.date("%Y-%m-%d %H:%M:%S", bm.updated_at), bm.description)
+        if each.line == line then
+            print(os.date("%Y-%m-%d %H:%M:%S", each.updated_at), each.description)
             return
         end
     end
@@ -401,23 +361,6 @@ end
 -- Dofile
 function M.load(item)
     data.bookmarks[item.id] = item
-
-    if data.bookmarks_groupby_filename[item.filename] == nil then
-        data.bookmarks_groupby_filename[item.filename] = {}
-    end
-    data.bookmarks_groupby_filename[item.filename][#data.bookmarks_groupby_filename[item.filename] + 1] = item.id
-
-    if data.bookmarks_groupby_tags["ALL"] == nil then
-        data.bookmarks_groupby_tags["ALL"] = {}
-    end
-    data.bookmarks_groupby_tags["ALL"][#data.bookmarks_groupby_tags["ALL"] + 1] = item.id
-
-    if item.tags ~= nil and item.tags ~= "" then
-        if data.bookmarks_groupby_tags[item.tags] == nil then
-            data.bookmarks_groupby_tags[item.tags] = {}
-        end
-        data.bookmarks_groupby_tags[item.tags][#data.bookmarks_groupby_tags[item.tags] + 1] = item.id
-    end
 end
 
 -- Character alignment.
