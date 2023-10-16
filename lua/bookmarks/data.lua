@@ -53,7 +53,9 @@ local M = {
 function M.get_by_filename(filename)
     local ret = {}
     for _, v in pairs(M.bookmarks) do
-        ret[#ret + 1] = v
+        if v.filename == filename then
+            ret[#ret + 1] = v
+        end
     end
     return ret
 end
@@ -74,9 +76,11 @@ end
 
 function M.get_tags()
     local ret = {}
+    local tags_map = {}
     for _, v in pairs(M.bookmarks) do
-        if v.tags ~= "" then
+        if v.tags ~= "" and tags_map[v.tags] == nil then
             ret[#ret + 1] = v.tags
+            tags_map[v.tags] = true
         end
     end
     return ret

@@ -322,7 +322,9 @@ end
 
 function M.change_tags()
     local tags_list = { "ALL" }
-    for _, value in pairs(data.get_tags()) do
+    local tmp_tags = data.get_tags()
+    table.sort(tmp_tags)
+    for _, value in pairs(tmp_tags) do
         table.insert(tags_list, value)
     end
     local line = vim.fn.line(".")
