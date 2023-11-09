@@ -42,7 +42,7 @@ function M.set_marks(buf, marks)
 
         local virt_text = text
         if virt_text == "" then
-            virt_text = "🔖 " .. mark.description
+            virt_text = mark.description
         end
         local ext_id = api.nvim_buf_set_extmark(buf, M.ns_id, mark.line - 1, -1, {
             virt_text = { { virt_text, "bookmarks_virt_text" } },

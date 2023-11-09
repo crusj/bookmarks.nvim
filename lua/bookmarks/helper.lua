@@ -30,6 +30,9 @@ local function read_preview_content(file_path, window_size, n)
     for line in file:lines() do
         table.insert(lines, line)
     end
+    if #lines < n then
+        return
+    end
 
     local start_line = math.max(n - math.floor(window_size / 2), 1)
     local end_line = math.min(start_line + window_size - 1, #lines)

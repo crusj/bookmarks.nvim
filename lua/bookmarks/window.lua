@@ -411,6 +411,9 @@ function M.preview_bookmark(filename, lineNumber)
     if filename ~= nil then
         local lines, relative_line_number = helper.read_preview_content(filename, h, lineNumber)
         if lines == nil then
+            api.nvim_buf_set_option(data.bufp, "modifiable", true)
+            api.nvim_buf_set_lines(data.bufp, 0, -1, false, {})
+            api.nvim_buf_set_option(data.bufp, "modifiable", false)
             return
         end
 
