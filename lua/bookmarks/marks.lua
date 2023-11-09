@@ -50,8 +50,18 @@ function M.set_marks(buf, marks)
             hl_group = "bookmarks_virt_text_hl",
         })
         M.marks[file_name][#M.marks[file_name] + 1] = ext_id
+
+        if require("bookmarks.config").data.sign_icon ~= "" then
+            M.set_sign(buf, mark.line)
+        end
         ::continue::
     end
+end
+
+function M.set_sign(pb, line)
+    vim.fn.sign_place(0, "BookmarkSign", "BookmarkSign", pb, {
+        lnum = line,
+    })
 end
 
 return M
