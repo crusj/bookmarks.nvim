@@ -49,7 +49,7 @@ function M.handle_add(line, buf1, buf2, buf, rows)
 
     -- Close description input box.
     w.close_add_win(buf1, buf2)
-    m.set_marks(0, M.get_buf_bookmark_lines(0))
+    m.set_marks(buf, M.get_buf_bookmark_lines(0))
     vim.cmd("stopinsert")
 end
 
@@ -138,11 +138,12 @@ end
 function M.delete_on_virt()
     local line = vim.fn.line(".")
     local file_name = api.nvim_buf_get_name(0)
+    local buf = api.nvim_get_current_buf()
     for k, v in pairs(data.bookmarks) do
         if v.line == line and file_name == v.filename then
             data.bookmarks[k] = nil
             w.regroup_tags(v.tags)
-            m.set_marks(0, M.get_buf_bookmark_lines(0))
+            m.set_marks(buf, M.get_buf_bookmark_lines(0))
             return
         end
     end

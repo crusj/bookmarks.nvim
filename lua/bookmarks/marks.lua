@@ -33,6 +33,7 @@ function M.set_marks(buf, marks)
     for _, id in ipairs(M.marks[file_name]) do
         api.nvim_buf_del_extmark(buf, M.ns_id, id)
     end
+    M.delete_sign(buf)
 
     -- set new old ext
     for _, mark in ipairs(marks) do
@@ -62,6 +63,10 @@ function M.set_sign(pb, line)
     vim.fn.sign_place(0, "BookmarkSign", "BookmarkSign", pb, {
         lnum = line,
     })
+end
+
+function M.delete_sign(pb)
+    vim.fn.sign_unplace("BookmarkSign", { buffer = pb })
 end
 
 return M
