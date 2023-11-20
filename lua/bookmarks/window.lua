@@ -428,7 +428,9 @@ function M.preview_bookmark(filename, lineNumber)
             local ext = cuts[#cuts]
             if #cuts > 1 and ext ~= "" then
                 api.nvim_buf_set_option(data.bufp, "syntax", ext)
-                vim.treesitter.start(data.bufp, ext)
+                pcall(function()
+                    vim.treesitter.start(data.bufp, ext)
+                end)
             end
         end)
 
