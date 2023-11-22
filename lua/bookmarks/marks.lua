@@ -46,9 +46,10 @@ function M.set_marks(buf, marks)
             virt_text = mark.description
         end
         local ext_id = api.nvim_buf_set_extmark(buf, M.ns_id, mark.line - 1, -1, {
-            virt_text = { { virt_text, "bookmarks_virt_text" } },
+            virt_text = { { virt_text, "bookmarks_virt_text_hl" } },
             virt_text_pos = "eol",
             hl_group = "bookmarks_virt_text_hl",
+            hl_mode = "combine"
         })
         M.marks[file_name][#M.marks[file_name] + 1] = ext_id
 
