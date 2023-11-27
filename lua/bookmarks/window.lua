@@ -347,12 +347,11 @@ function M.delete_tags(line)
                 end
             end
         end
-
-        -- remove from ALL tags list.
-        for i, each in pairs(data.bookmarks_groupby_tags["ALL"]) do
-            if each == data.bookmarks_order_ids[line] then
-                data.bookmarks_groupby_tags["ALL"][i] = nil
-            end
+    end
+    -- remove from ALL tags list.
+    for i, each in pairs(data.bookmarks_groupby_tags["ALL"]) do
+        if each == data.bookmarks_order_ids[line] then
+            data.bookmarks_groupby_tags["ALL"][i] = nil
         end
     end
     data.bookmarks[data.bookmarks_order_ids[line]] = nil
