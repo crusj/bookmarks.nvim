@@ -354,7 +354,13 @@ end
 -- Restore bookmarks from disk file.
 function M.load_data()
     -- vim.notify("load bookmarks data", "info")
-    local cwd = string.gsub(api.nvim_eval("getcwd()"), config.sep_path, "_")
+    -- windows issue #37
+    local cwd
+    if config.sep_path == "\\" then
+        cwd = string.gsub(api.nvim_eval("getcwd()"), "[\\:]", "_")
+    else
+        cwd = string.gsub(api.nvim_eval("getcwd()"), config.sep_path, "_")
+    end
     if data.cwd ~= nil and cwd ~= data.cwd then -- maybe change session
         M.persistent()
         data.bookmarks = {}
