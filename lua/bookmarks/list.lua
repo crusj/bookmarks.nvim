@@ -332,7 +332,11 @@ require("bookmarks.list").load{
             if type(v) == "number" then
                 sub = sub .. string.format("%s = %s,", k, v)
             else
-                sub = sub .. string.format("%s = '%s',", k, v)
+                -- issue #37
+                if config.sep_path == "\\" and k == "filename" then
+                    v = string.gsub(v, "[\\]", "\\\\")
+                end
+                sub = sub .. string.format("%s = \"%s\",", k, v)
             end
         end
         if str == "" then
