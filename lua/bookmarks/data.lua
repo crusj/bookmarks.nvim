@@ -16,18 +16,15 @@ local M = {
     bufb = nil,
     bufbw = nil,
 
-    bw = 0,       -- bookmarks window width
-    bh = 0,       -- bookmarks window height
-    tw = 0,       -- tags window width
-    th = 0,       -- tags window height
+    bw = 0,         -- bookmarks window width
+    bh = 0,         -- bookmarks window height
+    tw = 0,         -- tags window width
+    th = 0,         -- tags window height
 
-    buft = nil,   -- tags buffer
-    buftw = nil,  -- tags window
-    bufbt = nil,  -- tags border buffer
-    bufbtw = nil, -- tags border window
-
-    buff = nil,
-    bufw = nil,
+    buft = nil,     -- tags buffer
+    buftw = nil,    -- tags window
+    bufbt = nil,    -- tags border buffer
+    bufbtw = nil,   -- tags border window
 
     bufbp = nil,    -- preview border buffer
     bufbpw = nil,   -- preview border buffer window
