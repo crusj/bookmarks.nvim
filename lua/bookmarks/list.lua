@@ -280,12 +280,12 @@ function M.jump(line)
     for _, id in pairs(api.nvim_list_wins()) do
         if api.nvim_win_get_buf(id) == buf then
             api.nvim_set_current_buf(buf)
+            api.nvim_win_set_cursor(id, { item.line, 0 })
             return
         end
     end
 
-    vim.cmd("e " .. item.filename)
-    vim.api.nvim_win_set_cursor(0, { item.line, 0 })
+    vim.cmd("e +" .. item.line .. " " .. item.filename)
 end
 
 function M.restore()
