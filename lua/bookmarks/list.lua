@@ -281,6 +281,19 @@ function M.jump(line)
         vim.cmd("execute  \"normal! zz\"")
     end
 
+    local is_default_buf = function (str)
+        local parts = {} 
+        for part in string.gmatch (str, "%S+") do
+            table.insert (parts, part)
+        end
+        local last = parts[#parts]
+        if last == '[1]' then
+            return true
+        else
+            return false
+        end
+    end
+
     local pre_buf_name = api.nvim_buf_get_name(data.buff)
     if vim.loop.fs_stat(pre_buf_name) then
         api.nvim_set_current_win(data.bufw)
@@ -290,7 +303,7 @@ function M.jump(line)
     else
         for _, id in pairs(api.nvim_list_wins()) do
             local buf = api.nvim_win_get_buf(id)
-            if vim.loop.fs_stat(api.nvim_buf_get_name(buf)) then
+            if vim.loop.fs_stat(api.nvim_buf_get_name(buf)) or is_default_buf(api.nvim_buf_get_name(buf)) then
                 api.nvim_set_current_win(id)
                 fn("e ")
                 goto continue
