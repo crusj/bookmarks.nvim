@@ -425,7 +425,7 @@ function M.preview_bookmark(filename, lineNumber)
         vim.schedule(function()
             local cuts = filename:split_b(".")
             local ext = cuts[#cuts]
-            if #cuts > 1 and ext ~= "" and data.bufp then
+            if #cuts > 1 and ext ~= "" and data.bufp ~= nil then
                 api.nvim_buf_set_option(data.bufp, "syntax", ext)
                 pcall(function()
                     vim.treesitter.start(data.bufp, ext)
