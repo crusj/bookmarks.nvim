@@ -125,6 +125,9 @@ local function tags_autocmd(buffer)
 end
 
 function M.open_bookmarks()
+    data.buff = api.nvim_get_current_buf()
+    data.bufw = api.nvim_get_current_win()
+
     local _, _, _, _, w, h, wrow, wcol, _, _, _, _ = calculate_window_size()
     data.bw = w
     data.bh = h
@@ -422,7 +425,7 @@ function M.preview_bookmark(filename, lineNumber)
         vim.schedule(function()
             local cuts = filename:split_b(".")
             local ext = cuts[#cuts]
-            if #cuts > 1 and ext ~= "" and data.bufp ~= nil then
+            if #cuts > 1 and ext ~= "" then
                 api.nvim_buf_set_option(data.bufp, "syntax", ext)
                 pcall(function()
                     vim.treesitter.start(data.bufp, ext)

@@ -264,10 +264,10 @@ end
 
 -- Bookmark jump.
 function M.jump(line)
-    w.close_bookmarks()
-
     local item = data.bookmarks[data.bookmarks_order_ids[line]]
+
     if item == nil then
+        w.close_bookmarks()
         M.restore()
         return
     end
@@ -275,17 +275,33 @@ function M.jump(line)
     data.bookmarks[data.bookmarks_order_ids[line]].fre = data.bookmarks[data.bookmarks_order_ids[line]].fre + 1
     data.bookmarks[data.bookmarks_order_ids[line]].updated_at = os.time()
 
-    local buf = vim.fn.bufadd(item.filename)
-
-    for _, id in pairs(api.nvim_list_wins()) do
-        if api.nvim_win_get_buf(id) == buf then
-            api.nvim_set_current_buf(buf)
-            return
-        end
+    local fn = function(cmd)
+        vim.cmd(cmd .. item.filename)
+        vim.cmd("execute  \"normal! " .. item.line .. "G;zz\"")
+        vim.cmd("execute  \"normal! zz\"")
     end
 
-    vim.cmd("e " .. item.filename)
-    vim.api.nvim_win_set_cursor(0, { item.line, 0 })
+    local pre_buf_name = api.nvim_buf_get_name(data.buff)
+    if vim.loop.fs_stat(pre_buf_name) then
+        api.nvim_set_current_win(data.bufw)
+        fn("e ")
+        goto continue
+        return
+    else
+        for _, id in pairs(api.nvim_list_wins()) do
+            local buf = api.nvim_win_get_buf(id)
+            if vim.loop.fs_stat(api.nvim_buf_get_name(buf)) then
+                api.nvim_set_current_win(id)
+                fn("e ")
+                goto continue
+                return
+            end
+        end
+        fn("vs ")
+    end
+
+    ::continue::
+    w.close_bookmarks()
 end
 
 function M.restore()
