@@ -114,6 +114,7 @@ require("bookmarks").setup({
         order = "<space><space>", -- Order bookmarks by frequency or updated_time(buf keymap)
         delete_on_virt = "\\dd", -- Delete bookmark at virt text line(global keymap)
         show_desc = "\\sd", -- show bookmark desc(global keymap)
+        toogle_focus = "<S-Tab>", -- toggle window focus (tags-win <-> bookmarks-win)
     },
     width = 0.8, -- Bookmarks window width:  (0, 1]
     height = 0.7, -- Bookmarks window height: (0, 1]
