@@ -205,7 +205,7 @@ function M.open_bookmarks()
     M.open_tags()
     vim.keymap.set(
         "n",
-        "<c-j>",
+        config.keymap.focus_tags,
         function()
             if api.nvim_win_is_valid(data.buftw) then
                 api.nvim_set_current_win(data.buftw)
@@ -294,7 +294,7 @@ function M.open_tags()
     )
     vim.keymap.set(
         "n",
-        "<c-k>",
+        config.keymap.focus_bookmarks,
         function()
             api.nvim_set_current_win(data.bufbw)
             focus_manager.update_current("bookmarks")

@@ -14,6 +14,8 @@ function M.setup(user_config)
             order = "<space><space>", -- order bookmarks by frequency or updated_time
             delete_on_virt = "\\dd",  -- delete bookmark at virt text line
             show_desc = "\\sd",       -- show bookmark desc
+            focus_tags = "<c-j>",      -- focus tags window
+            focus_bookmarks = "<c-k>", -- focus bookmarks window
             toogle_focus = "<S-Tab>", -- toggle window focus (tags-win <-> bookmarks-win)
         },
         width = 0.8,                  -- bookmarks window width:  (0, 1]
