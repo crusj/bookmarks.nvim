@@ -26,10 +26,15 @@ local focus_manager = (function()
 
         if next_type == nil then next_type = win_types[1] end
 
-        local win = wins[next_type]
-        assert(win ~= nil, "win is nil")
+        local next_win = wins[next_type]
+        if next_win == nil then
+            local msg = string.format("%s window not found", next_type)
+            vim.notify(msg, vim.log.levels.INFO, { title = "bookmarks.nvim" })
+            return
+        end
+
         current_type = next_type
-        api.nvim_set_current_win(win)
+        api.nvim_set_current_win(next_win)
     end
 
     return {
