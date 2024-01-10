@@ -10,7 +10,7 @@ local focus_manager = (function()
     --- @alias WinType string
     --- @alias WinId integer 
     local current_type = nil --- @type WinType | nil
-    local win_types = {} --- @type table<integer, WinType>
+    local win_types = {} --- @type WinType[]
     local wins = {} --- @type table<WinType, WinId>
 
     local function toogle()
@@ -37,8 +37,8 @@ local focus_manager = (function()
         update_current = function(type) current_type = type end,
         set = function(type, win) wins[type] = win end,
         register = function(type)
-          local exist = vim.tbl_contains(win_types, type)
-          if not exist then table.insert(win_types, type) end
+            local exist = vim.tbl_contains(win_types, type)
+            if not exist then table.insert(win_types, type) end
         end,
     }
 end)()
