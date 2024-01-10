@@ -48,6 +48,8 @@ function M.setup()
     config = require("bookmarks.config").get_data()
     vim.cmd(string.format("highlight hl_bookmarks_csl %s", config.hl.cursorline))
     float.setup()
+    focus_manager.register("tags")
+    focus_manager.register("bookmarks")
 end
 
 -- calculate window size.
@@ -197,7 +199,6 @@ function M.open_bookmarks()
     api.nvim_set_current_win(data.bufbw)
     bookmarks_autocmd(data.bufb)
 
-    focus_manager.register("bookmarks")
     focus_manager.set("bookmarks", data.bufbw)
     focus_manager.update_current("bookmarks") -- set default focus win
 
@@ -270,7 +271,6 @@ function M.open_tags()
     data.buftw = pair.win
     data.buftb = float.create_border(options).buf
     api.nvim_buf_set_option(pair.buf, 'filetype', 'btags')
-    focus_manager.register("tags")
     focus_manager.set("tags", data.buftw)
 
     local set_key_opts = { silent = true, noremap = true, buffer = data.buft }
