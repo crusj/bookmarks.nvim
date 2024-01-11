@@ -16,7 +16,7 @@ function M.setup(user_config)
             show_desc = "\\sd",       -- show bookmark desc
             focus_tags = "<c-j>",      -- focus tags window
             focus_bookmarks = "<c-k>", -- focus bookmarks window
-            toogle_focus = "<S-Tab>", -- toggle window focus (tags-win <-> bookmarks-win)
+            toogle_focus = "<S-Tab>", -- toggle window focus (tags-window <-> bookmarks-window)
         },
         width = 0.8,                  -- bookmarks window width:  (0, 1]
         height = 0.7,                 -- bookmarks window height: (0, 1]
