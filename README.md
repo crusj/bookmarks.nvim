@@ -114,7 +114,9 @@ require("bookmarks").setup({
         order = "<space><space>", -- Order bookmarks by frequency or updated_time(buf keymap)
         delete_on_virt = "\\dd", -- Delete bookmark at virt text line(global keymap)
         show_desc = "\\sd", -- show bookmark desc(global keymap)
-        toogle_focus = "<S-Tab>", -- toggle window focus (tags-win <-> bookmarks-win)
+        focus_tags = "<c-j>",      -- focus tags window
+        focus_bookmarks = "<c-k>", -- focus bookmarks window
+        toogle_focus = "<S-Tab>", -- toggle window focus (tags-window <-> bookmarks-window)
     },
     width = 0.8, -- Bookmarks window width:  (0, 1]
     height = 0.7, -- Bookmarks window height: (0, 1]
@@ -165,7 +167,8 @@ Tags is now supported to categorize bookmarks. You can add tags to your bookmark
 
 By default, ALL bookmarks are marked as ALL tags.
 
-You can use the shortcut keys `<c-j>` and `<c-k>` to jump through the Tags window and the bookmarks window.
+You can use the shortcut key `<S-Tab>` to switch the focus between the Tags and Bookmarks windows, or use the shortcut keys `<c-j>` and `<c-k>` to navigate through the Tags and Bookmarks windows.
+> Of course, you can change these default shortcut keys through the configuration settings if you so choose.
 
 ## Issue
 
