@@ -6,10 +6,55 @@ local api = vim.api
 local M = {}
 local config = nil
 
+local focus_manager = (function()
+    --- @alias WinType string
+    --- @alias WinId integer 
+    local current_type = nil --- @type WinType | nil
+    local win_types = {} --- @type WinType[]
+    local wins = {} --- @type table<WinType, WinId>
+
+    local function toogle()
+        local next_type = nil
+        for i, type in ipairs(win_types) do
+            if type == current_type then
+                local next_i = i + 1
+                if next_i > #win_types then next_i = 1 end
+                next_type = win_types[next_i]
+                break
+            end
+        end
+
+        if next_type == nil then next_type = win_types[1] end
+
+        local next_win = wins[next_type]
+        if next_win == nil then
+            local msg = string.format("%s window not found", next_type)
+            vim.notify(msg, vim.log.levels.INFO, { title = "bookmarks.nvim" })
+            return
+        end
+
+        current_type = next_type
+        api.nvim_set_current_win(next_win)
+    end
+
+    return {
+        toogle = toogle,
+        update_current = function(type) current_type = type end,
+        set = function(type, win) wins[type] = win end,
+        register = function(type)
+            local exist = vim.tbl_contains(win_types, type)
+            if not exist then table.insert(win_types, type) end
+        end,
+    }
+end)()
+
+
 function M.setup()
     config = require("bookmarks.config").get_data()
     vim.cmd(string.format("highlight hl_bookmarks_csl %s", config.hl.cursorline))
     float.setup()
+    focus_manager.register("tags")
+    focus_manager.register("bookmarks")
 end
 
 -- calculate window size.
@@ -159,17 +204,23 @@ function M.open_bookmarks()
     api.nvim_set_current_win(data.bufbw)
     bookmarks_autocmd(data.bufb)
 
+    focus_manager.set("bookmarks", data.bufbw)
+    focus_manager.update_current("bookmarks") -- set default focus win
+
+    local set_key_opts = { silent = true, noremap = true, buffer = data.bufb }
     M.open_tags()
     vim.keymap.set(
         "n",
-        "<c-j>",
+        config.keymap.focus_tags,
         function()
             if api.nvim_win_is_valid(data.buftw) then
                 api.nvim_set_current_win(data.buftw)
+                focus_manager.update_current("tags")
             end
         end,
-        { silent = true, noremap = true, buffer = data.bufb }
+        set_key_opts
     )
+    vim.keymap.set("n", config.keymap.toogle_focus, focus_manager.toogle, set_key_opts)
 end
 
 function M.set_title(b, title, width)
@@ -225,6 +276,9 @@ function M.open_tags()
     data.buftw = pair.win
     data.buftb = float.create_border(options).buf
     api.nvim_buf_set_option(pair.buf, 'filetype', 'btags')
+    focus_manager.set("tags", data.buftw)
+
+    local set_key_opts = { silent = true, noremap = true, buffer = data.buft }
     vim.keymap.set(
         "n",
         "<2-LeftMouse>",
@@ -232,7 +286,7 @@ function M.open_tags()
             M.change_tags()
             api.nvim_set_current_win(data.bufbw)
         end,
-        { silent = true, noremap = true, buffer = data.buft }
+        set_key_opts
     )
     vim.keymap.set(
         "n",
@@ -241,14 +295,18 @@ function M.open_tags()
             M.change_tags()
             api.nvim_set_current_win(data.bufbw)
         end,
-        { silent = true, noremap = true, buffer = data.buft }
+        set_key_opts
     )
     vim.keymap.set(
         "n",
-        "<c-k>",
-        function() api.nvim_set_current_win(data.bufbw) end,
-        { silent = true, noremap = true, buffer = data.buft }
+        config.keymap.focus_bookmarks,
+        function()
+            api.nvim_set_current_win(data.bufbw)
+            focus_manager.update_current("bookmarks")
+        end,
+        set_key_opts
     )
+    vim.keymap.set("n", config.keymap.toogle_focus, focus_manager.toogle, set_key_opts)
     M.write_tags()
 end
 
