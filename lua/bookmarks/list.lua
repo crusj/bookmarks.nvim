@@ -202,10 +202,10 @@ function M.flush()
             rep2 = math.floor(data.bw * 0.4)
         end
 
-
-        lines[#lines + 1] = string.format("%s %s [%s]",
-            M.padding(string.format("%s|%s", M.padding(tostring(item.line), 3), item.description), rep1),
-            M.padding(icon .. " " .. s[#s], rep2), tmp)
+        local normalized_mark_text = M.padding(string.format("%s|%s", M.padding(tostring(item.line), 3), item.description), rep1)
+        local relative_filepath =  vim.fn.fnamemodify(s[#s], ":~:." .. data.cwd .. ":.")
+        local normalized_filepath = M.padding(icon .. " " .. relative_filepath , rep2)
+        lines[#lines + 1] = string.format("%s %s [%s]", normalized_mark_text, normalized_filepath, tmp)
         data.bookmarks_order_ids[#data.bookmarks_order_ids + 1] = item.id
         ::continue::
     end
