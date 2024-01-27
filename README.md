@@ -127,6 +127,7 @@ require("bookmarks").setup({
     virt_text = "", -- Show virt text at the end of bookmarked lines, if it is empty, use the description of bookmarks instead.
     sign_icon = "󰃃",                                           -- if it is not empty, show icon in signColumn.
     virt_pattern = { "*.go", "*.lua", "*.sh", "*.php", "*.rs" }, -- Show virt text only on matched pattern
+    virt_ignore_pattern = {}, -- Ignore showing virt text on matched pattern, this works after virt_pattern
     border_style = "single", -- border style: "single", "double", "rounded" 
     hl = {
         border = "TelescopeBorder", -- border highlight

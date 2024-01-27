@@ -8,14 +8,23 @@ local M = {
 function M.set_marks(buf, marks)
     local file_name = vim.api.nvim_buf_get_name(buf)
     local pattern = require("bookmarks.config").data.virt_pattern
+    local ignore_pattern = require("bookmarks.config").data.virt_ignore_pattern
     local cuts = file_name:split_b(".")
 
     if #cuts > 1 then
         local ext = cuts[#cuts]
         local is_match = false
         for _, p in ipairs(pattern) do
-            if string.sub(p, 3) == ext then
+            local suffix = string.sub(p, 3)
+            if p == '*' or suffix == '*' or suffix == ext then
                 is_match = true
+                break
+            end
+        end
+        for _, p in ipairs(ignore_pattern) do
+            local suffix = string.sub(p, 3)
+            if p == '*' or suffix == '*' or suffix == ext then
+                is_match = false
                 break
             end
         end

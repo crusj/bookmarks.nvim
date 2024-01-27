@@ -26,6 +26,7 @@ function M.setup(user_config)
         virt_text = "", -- Show virt text at the end of bookmarked lines, if it is empty, use the description of bookmarks instead.
         sign_icon = "󰃃", -- if it is not empty, show icon in signColumn.
         virt_pattern = { "*.go", "*.lua", "*.sh", "*.php", "*.rs" }, -- Show virt text only on matched pattern
+        virt_ignore_pattern = {}, -- Ignore virt text on matched pattern
         border_style = "single", -- border style: "single", "double", "rounded"
         hl = {
             border = "TelescopeBorder", -- border highlight
@@ -36,7 +37,7 @@ function M.setup(user_config)
 
     if user_config ~= nil and type(user_config) == "table" then
         for dk, dv in pairs(M.data) do
-            if type(dv) ~= "table" or dk == 'virt_pattern' then
+            if type(dv) ~= "table" or dk == 'virt_pattern' or dk == 'virt_ignore_pattern' then
                 if user_config[dk] ~= nil then
                     M.data[dk] = user_config[dk]
                 end
