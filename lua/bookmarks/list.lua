@@ -20,13 +20,13 @@ function M.add_bookmark(line, buf, rows)
     -- Press the esc key to cancel add bookmark.
     vim.keymap.set("n", "<ESC>",
         function() w.close_add_win(bufs_pairs.pairs.buf, bufs_pairs.border_pairs.buf) end,
-        { silent = true, buffer = bufs_pairs.pairs.buf }
+        { desc = "bookmarks close add win", silent = true, buffer = bufs_pairs.pairs.buf }
     )
 
     -- Press the enter key to confirm add bookmark.
     vim.keymap.set("i", "<CR>",
         function() M.handle_add(line, bufs_pairs.pairs.buf, bufs_pairs.border_pairs.buf, buf, rows) end,
-        { silent = true, noremap = true, buffer = bufs_pairs.pairs.buf }
+        { desc = "bookmarks confirm bookmarks", silent = true, noremap = true, buffer = bufs_pairs.pairs.buf }
     )
 end
 

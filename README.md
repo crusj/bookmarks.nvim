@@ -108,6 +108,7 @@ require("bookmarks").setup({
     mappings_enabled = true, -- If the value is false, only valid for global keymaps: toggle、add、delete_on_virt、show_desc
     keymap = {
         toggle = "<tab><tab>", -- Toggle bookmarks(global keymap)
+        close = "q", -- close bookmarks (buf keymap)
         add = "\\z", -- Add bookmarks(global keymap)
         jump = "<CR>", -- Jump from bookmarks(buf keymap)
         delete = "dd", -- Delete bookmarks(buf keymap)
