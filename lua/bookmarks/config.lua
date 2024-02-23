@@ -8,6 +8,7 @@ function M.setup(user_config)
         mappings_enabled = true,
         keymap = {
             toggle = "<tab><tab>",    -- toggle bookmarks
+            close = "q",              -- close bookmarks (buffer mapping)
             add = "\\z",              -- add bookmarks
             jump = "<CR>",            -- jump from bookmarks
             delete = "dd",            -- delete bookmarks

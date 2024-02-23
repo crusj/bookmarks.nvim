@@ -192,11 +192,11 @@ function M.open_bookmarks()
     data.bufbb = float.create_border(options).buf
     api.nvim_buf_set_option(data.bufb, 'filetype', 'bookmarks')
 
-    local map_opts = { buffer = data.bufb, silent = true }
-    vim.keymap.set("n", config.keymap.jump, require("bookmarks").jump, map_opts)
-    vim.keymap.set("n", "<2-LeftMouse>", require("bookmarks").jump, map_opts)
-    vim.keymap.set("n", config.keymap.delete, require("bookmarks").delete, map_opts)
-    vim.keymap.set("n", config.keymap.order, function() require("bookmarks.list").refresh(true) end, map_opts)
+    vim.keymap.set( "n", config.keymap.jump, require("bookmarks").jump, { desc = "bookmarks jump", buffer = data.bufb, silent = true })
+    vim.keymap.set("n", "<2-LeftMouse>", require("bookmarks").jump, { buffer = data.bufb, silent = true })
+    vim.keymap.set("n", config.keymap.delete, require("bookmarks").delete, { desc = "bookmarks delete", buffer = data.bufb, silent = true })
+    vim.keymap.set("n", config.keymap.order, function() require("bookmarks.list").refresh(true) end, { desc = "bookmarks order", buffer = data.bufb, silent = true })
+    vim.keymap.set("n", config.keymap.close, function() require("bookmarks").close_bookmarks() end, { desc = "bookmarks close", buffer = data.bufb, silent = true })
 
     api.nvim_win_set_option(data.bufbw, "cursorline", true)
     api.nvim_win_set_option(data.bufbw, "wrap", false)
@@ -218,9 +218,14 @@ function M.open_bookmarks()
                 focus_manager.update_current("tags")
             end
         end,
-        set_key_opts
+        { desc = "bookmarks focus tags", silent = true, noremap = true, buffer = data.bufb }
     )
-    vim.keymap.set("n", config.keymap.toogle_focus, focus_manager.toogle, set_key_opts)
+    vim.keymap.set(
+        "n",
+        config.keymap.toogle_focus,
+        focus_manager.toogle,
+        { desc = "bookmarks focus tags", silent = true, noremap = true, buffer = data.bufb }
+    )
 end
 
 function M.set_title(b, title, width)
@@ -286,7 +291,7 @@ function M.open_tags()
             M.change_tags()
             api.nvim_set_current_win(data.bufbw)
         end,
-        set_key_opts
+        { desc = "bookmarks change tags", silent = true, noremap = true, buffer = data.buft }
     )
     vim.keymap.set(
         "n",
@@ -295,7 +300,7 @@ function M.open_tags()
             M.change_tags()
             api.nvim_set_current_win(data.bufbw)
         end,
-        set_key_opts
+        { desc = "bookmarks change tags", silent = true, noremap = true, buffer = data.buft }
     )
     vim.keymap.set(
         "n",
@@ -304,9 +309,10 @@ function M.open_tags()
             api.nvim_set_current_win(data.bufbw)
             focus_manager.update_current("bookmarks")
         end,
-        set_key_opts
+        { desc = "bookmarks focus", silent = true, noremap = true, buffer = data.buft }
     )
-    vim.keymap.set("n", config.keymap.toogle_focus, focus_manager.toogle, set_key_opts)
+    vim.keymap.set("n", config.keymap.toogle_focus, focus_manager.toogle, { desc = "bookmarks close", silent = true, noremap = true, buffer = data.buft })
+    vim.keymap.set("n", config.keymap.close, function() require("bookmarks").close_bookmarks() end, { desc = "bookmarks close", buffer = data.buft, silent = true })
     M.write_tags()
 end
 
