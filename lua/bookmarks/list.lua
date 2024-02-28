@@ -199,7 +199,7 @@ function M.flush()
         local rep1 = math.floor(data.bw * 0.3)
         local rep2 = math.floor(data.bw * 0.5)
 
-        local icon = (require 'nvim-web-devicons'.get_icon(item.filename)) or ""
+        local icon = (require 'nvim-web-devicons'.get_icon(item.filename)) or " "
 
         local tmp = item.fre
         if data.bookmarks_order == "time" then
@@ -207,10 +207,15 @@ function M.flush()
             rep2 = math.floor(data.bw * 0.4)
         end
 
+        if icon ~= " " then
+            rep2 = rep2 + 1
+        end
+
 
         local description = item.description
         if item.is_global ~= nil and item.is_global == true then -- global description
             description = string.format("󰯾 %s", description)
+            rep1 = rep1 + 1
         end
 
         lines[#lines + 1] = string.format("%s %s [%s]",
@@ -234,13 +239,9 @@ function M.padding(str, len)
     local tmp = ""
     local total_len = 0
     for _, codepoint in utf8.codes(str) do
-        local char = codepoint
-        if string.len(char) == 1 or char == "…" then
-            total_len = total_len + 1
-        else
-            total_len = total_len + 2
-        end
+        total_len = total_len + utf8_char_width(codepoint)
     end
+
     if total_len > len then
         local show_len = len - 1
         local i = 0
@@ -249,7 +250,7 @@ function M.padding(str, len)
                 break
             end
             local char = codepoint
-            if string.len(char) == 1 then
+            if utf8_char_width(char) == 1 then
                 tmp = tmp .. char
                 i = i + 1
             else
@@ -263,6 +264,27 @@ function M.padding(str, len)
         return tmp .. string.rep("…", len - i)
     else
         return str .. string.rep(" ", len - total_len)
+    end
+end
+
+-- 判断一个UTF-8单个字符的宽度te()
+function utf8_char_width(char)
+    local byte = char:byte()
+    if byte >= 0 and byte <= 127 then
+        -- 单字节字符(ASCII)，占用1个字符宽度
+        return 1
+    elseif byte >= 194 and byte <= 223 then
+        -- 双字节字符，可能占用2个字符宽度
+        return 2
+    elseif byte >= 224 and byte <= 239 then
+        -- 三字节字符，可能占用2个字符宽度
+        return 2
+    elseif byte >= 240 and byte <= 244 then
+        -- 四字节字符，可能占用2个字符宽度
+        return 2
+    else
+        -- 其他情况，返回0长度
+        return 0
     end
 end
 
