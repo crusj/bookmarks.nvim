@@ -87,6 +87,7 @@ function M.add(filename, line, line_md5, description, rows, is_global)
             rows = rows,         -- for fix
             line_md5 = line_md5, -- for fix
             is_global = is_global,
+            is_new = true,
         }
 
         if data.bookmarks_groupby_filename[filename] == nil then
@@ -362,41 +363,25 @@ end
 
 -- Write bookmarks into disk file for next load.
 function M.persistent()
-    local tpl = [[
-require("bookmarks.list").load{
-	_
-}]]
-
     local local_str = ""
     local global_str = ""
+    local global_old_data = {}
     for id, data in pairs(data.bookmarks) do
-        local sub = ""
-        for k, v in pairs(data) do
-            if sub ~= "" then
-                sub = string.format("%s\n%s", sub, string.rep(" ", 4))
-            end
-            if type(v) == "number" or type(v) == "boolean" then
-                sub = sub .. string.format("%s = %s,", k, v)
-            else
-                -- issue #37
-                if config.sep_path == "\\" and k == "filename" then
-                    v = string.gsub(v, "[\\]", "\\\\")
-                end
-                sub = sub .. string.format("%s = \"%s\",", k, v)
-            end
-        end
-
+        local sub = M.fill_tpl(data)
         if data["is_global"] ~= nil and data["is_global"] == true then -- global bookmarks
-            if global_str == "" then
-                global_str = string.format("%s%s", global_str, string.gsub(tpl, "_", sub))
-            else
-                global_str = string.format("%s\n%s", global_str, string.gsub(tpl, "_", sub))
+            if data["is_new"] == true then
+                if global_str == "" then
+                    global_str = string.format("%s%s", global_str, sub)
+                else
+                    global_str = string.format("%s\n%s", global_str, sub)
+                end
             end
+            global_old_data[id] = data
         else
             if local_str == "" then
-                local_str = string.format("%s%s", local_str, string.gsub(tpl, "_", sub))
+                local_str = string.format("%s%s", local_str, sub)
             else
-                local_str = string.format("%s\n%s", local_str, string.gsub(tpl, "_", sub))
+                local_str = string.format("%s\n%s", local_str, sub)
             end
         end
     end
@@ -412,9 +397,46 @@ require("bookmarks.list").load{
 
     -- global bookmarks
     local global_file_name = config.storage_dir .. config.sep_path .. "bookmarks_global"
+    if vim.loop.fs_stat(global_file_name) then
+        data.bookmarks = {}
+        dofile(global_file_name)
+        -- combine
+        for id, value in pairs(data.bookmarks) do
+            if global_old_data[id] ~= nil then
+                global_str = string.format("%s\n%s", global_str, M.fill_tpl(global_old_data[id]))
+            elseif data.deleted_ids[id] == nil then
+                global_str = string.format("%s\n%s", global_str, M.fill_tpl(value)) -- new
+            end
+        end
+    end
+
     local global_fd = assert(io.open(global_file_name, "w"))
     global_fd:write(global_str)
     global_fd:close()
+end
+
+function M.fill_tpl(data)
+    local tpl = [[
+require("bookmarks.list").load{
+	_
+}]]
+    local sub = ""
+    for k, v in pairs(data) do
+        if sub ~= "" then
+            sub = string.format("%s\n%s", sub, string.rep(" ", 4))
+        end
+        if type(v) == "number" or type(v) == "boolean" then
+            sub = sub .. string.format("%s = %s,", k, v)
+        else
+            -- issue #37
+            if config.sep_path == "\\" and k == "filename" then
+                v = string.gsub(v, "[\\]", "\\\\")
+            end
+            sub = sub .. string.format("%s = \"%s\",", k, v)
+        end
+    end
+
+    return string.gsub(tpl, "_", sub)
 end
 
 -- Restore bookmarks from disk file.

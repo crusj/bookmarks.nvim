@@ -425,6 +425,7 @@ function M.delete_tags(line)
         end
     end
     data.bookmarks[data.bookmarks_order_ids[line]] = nil
+    data.deleted_ids[data.bookmarks_order_ids[line]] = true
 end
 
 function M.regroup_tags(tags)

@@ -6,6 +6,7 @@ local M = {
     bookmarks_order = "time",
     current_tags = "ALL",            -- current  tags
     tags = {},
+    deleted_ids = {},                -- deleted ids
 
     cwd = nil,
     data_filename = nil,
