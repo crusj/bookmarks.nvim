@@ -422,17 +422,19 @@ require("bookmarks.list").load{
 }]]
     local sub = ""
     for k, v in pairs(data) do
-        if sub ~= "" then
-            sub = string.format("%s\n%s", sub, string.rep(" ", 4))
-        end
-        if type(v) == "number" or type(v) == "boolean" then
-            sub = sub .. string.format("%s = %s,", k, v)
-        else
-            -- issue #37
-            if config.sep_path == "\\" and k == "filename" then
-                v = string.gsub(v, "[\\]", "\\\\")
+        if k ~= "is_new" then
+            if sub ~= "" then
+                sub = string.format("%s\n%s", sub, string.rep(" ", 4))
             end
-            sub = sub .. string.format("%s = \"%s\",", k, v)
+            if type(v) == "number" or type(v) == "boolean" then
+                sub = sub .. string.format("%s = %s,", k, v)
+            else
+                -- issue #37
+                if config.sep_path == "\\" and k == "filename" then
+                    v = string.gsub(v, "[\\]", "\\\\")
+                end
+                sub = sub .. string.format("%s = \"%s\",", k, v)
+            end
         end
     end
 
