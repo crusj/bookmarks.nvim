@@ -13,9 +13,13 @@ function M.setup()
     M.load_data()
 end
 
-function M.add_bookmark(line, buf, rows)
+function M.add_bookmark(line, buf, rows, is_global)
     --  Open the bookmark description input box.
-    local bufs_pairs = w.open_add_win(line)
+    local title = "Input description: [Tag:]Desc"
+    if is_global then
+        title = "Global Input description: [Tag:]Desc"
+    end
+    local bufs_pairs = w.open_add_win(title)
 
     -- Press the esc key to cancel add bookmark.
     vim.keymap.set("n", "<ESC>",
@@ -25,12 +29,12 @@ function M.add_bookmark(line, buf, rows)
 
     -- Press the enter key to confirm add bookmark.
     vim.keymap.set("i", "<CR>",
-        function() M.handle_add(line, bufs_pairs.pairs.buf, bufs_pairs.border_pairs.buf, buf, rows) end,
+        function() M.handle_add(line, bufs_pairs.pairs.buf, bufs_pairs.border_pairs.buf, buf, rows, is_global) end,
         { desc = "bookmarks confirm bookmarks", silent = true, noremap = true, buffer = bufs_pairs.pairs.buf }
     )
 end
 
-function M.handle_add(line, buf1, buf2, buf, rows)
+function M.handle_add(line, buf1, buf2, buf, rows, is_global)
     -- Get buf's filename.
     local filename = api.nvim_buf_get_name(buf)
     if filename == nil or filename == "" then
@@ -44,7 +48,7 @@ function M.handle_add(line, buf1, buf2, buf, rows)
         local content = api.nvim_buf_get_lines(buf, line - 1, line, true)[1]
         -- Save bookmark with description.
         M.add(filename, line, md5.sumhexa(content),
-            description, rows)
+            description, rows, is_global)
     end
 
     -- Close description input box.
@@ -55,7 +59,7 @@ end
 
 -- Save bookmark as lua code.
 -- rows is the file's number..
-function M.add(filename, line, line_md5, description, rows)
+function M.add(filename, line, line_md5, description, rows, is_global)
     local id = md5.sumhexa(string.format("%s:%s", filename, line))
     local now = os.time()
     local cuts = description:split_b(":")
@@ -82,6 +86,7 @@ function M.add(filename, line, line_md5, description, rows)
             fre = 1,
             rows = rows,         -- for fix
             line_md5 = line_md5, -- for fix
+            is_global = is_global,
         }
 
         if data.bookmarks_groupby_filename[filename] == nil then
@@ -203,8 +208,13 @@ function M.flush()
         end
 
 
+        local description = item.description
+        if item.is_global ~= nil and item.is_global == true then -- global description
+            description = string.format("󰯾 %s", description)
+        end
+
         lines[#lines + 1] = string.format("%s %s [%s]",
-            M.padding(string.format("%s|%s", M.padding(tostring(item.line), 3), item.description), rep1),
+            M.padding(string.format("%s|%s", M.padding(tostring(item.line), 3), description), rep1),
             M.padding(icon .. " " .. s[#s], rep2), tmp)
         data.bookmarks_order_ids[#data.bookmarks_order_ids + 1] = item.id
         ::continue::
@@ -281,10 +291,10 @@ function M.jump(line)
         vim.cmd("execute  \"normal! zz\"")
     end
 
-    local is_default_buf = function (str)
-        local parts = {} 
-        for part in string.gmatch (str, "%S+") do
-            table.insert (parts, part)
+    local is_default_buf = function(str)
+        local parts = {}
+        for part in string.gmatch(str, "%S+") do
+            table.insert(parts, part)
         end
         local last = parts[#parts]
         if last == '[1]' then
@@ -335,14 +345,15 @@ require("bookmarks.list").load{
 	_
 }]]
 
-    local str = ""
+    local local_str = ""
+    local global_str = ""
     for id, data in pairs(data.bookmarks) do
         local sub = ""
         for k, v in pairs(data) do
             if sub ~= "" then
                 sub = string.format("%s\n%s", sub, string.rep(" ", 4))
             end
-            if type(v) == "number" then
+            if type(v) == "number" or type(v) == "boolean" then
                 sub = sub .. string.format("%s = %s,", k, v)
             else
                 -- issue #37
@@ -352,10 +363,19 @@ require("bookmarks.list").load{
                 sub = sub .. string.format("%s = \"%s\",", k, v)
             end
         end
-        if str == "" then
-            str = string.format("%s%s", str, string.gsub(tpl, "_", sub))
+
+        if data["is_global"] ~= nil and data["is_global"] == true then -- global bookmarks
+            if global_str == "" then
+                global_str = string.format("%s%s", global_str, string.gsub(tpl, "_", sub))
+            else
+                global_str = string.format("%s\n%s", global_str, string.gsub(tpl, "_", sub))
+            end
         else
-            str = string.format("%s\n%s", str, string.gsub(tpl, "_", sub))
+            if local_str == "" then
+                local_str = string.format("%s%s", local_str, string.gsub(tpl, "_", sub))
+            else
+                local_str = string.format("%s\n%s", local_str, string.gsub(tpl, "_", sub))
+            end
         end
     end
 
@@ -363,9 +383,16 @@ require("bookmarks.list").load{
         return
     end
 
-    local fd = assert(io.open(data.data_filename, "w"))
-    fd:write(str)
-    fd:close()
+    -- local bookmarks
+    local local_fd = assert(io.open(data.data_filename, "w"))
+    local_fd:write(local_str)
+    local_fd:close()
+
+    -- global bookmarks
+    local global_file_name = config.storage_dir .. config.sep_path .. "bookmarks_global"
+    local global_fd = assert(io.open(global_file_name, "w"))
+    global_fd:write(global_str)
+    global_fd:close()
 end
 
 -- Restore bookmarks from disk file.
@@ -392,9 +419,16 @@ function M.load_data()
         assert(os.execute("mkdir " .. config.storage_dir))
     end
 
+    -- local bookmarks
     local data_filename = string.format("%s%s%s", config.storage_dir, config.sep_path, cwd)
     if vim.loop.fs_stat(data_filename) then
         dofile(data_filename)
+    end
+
+    -- global bookmarks
+    local global_data_filename = config.storage_dir .. config.sep_path .. "bookmarks_global"
+    if vim.loop.fs_stat(global_data_filename) then
+        dofile(global_data_filename)
     end
 
     data.cwd = cwd

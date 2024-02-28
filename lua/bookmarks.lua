@@ -22,8 +22,8 @@ function M.setup(user_config)
 end
 
 -- Add bookmark.
-function M.add_bookmarks()
-    l.add_bookmark(vim.fn.line('.'), api.nvim_get_current_buf(), vim.fn.line("$"))
+function M.add_bookmarks(is_global)
+    l.add_bookmark(vim.fn.line('.'), api.nvim_get_current_buf(), vim.fn.line("$"), is_global)
 end
 
 -- Open bookmarks window.

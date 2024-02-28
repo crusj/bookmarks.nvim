@@ -110,6 +110,7 @@ require("bookmarks").setup({
         toggle = "<tab><tab>", -- Toggle bookmarks(global keymap)
         close = "q", -- close bookmarks (buf keymap)
         add = "\\z", -- Add bookmarks(global keymap)
+        add_global = "\\g" -- Add global bookmarks(global keymap), global bookmarks will appear in all projects. Identified with the symbol '󰯾'
         jump = "<CR>", -- Jump from bookmarks(buf keymap)
         delete = "dd", -- Delete bookmarks(buf keymap)
         order = "<space><space>", -- Order bookmarks by frequency or updated_time(buf keymap)
@@ -150,7 +151,8 @@ require("bookmarks").setup({
 
 | Desc                              | Func                                     |
 | --------------------------------- | ---------------------------------------- |
-| Add bookmarks                     | require'bookmarks'.add_bookmarks()       |
+| Add local bookmarks               | require'bookmarks'.add_bookmarks(fasle)  |
+| Add global bookmarks              | require'bookmarks'.add_bookmarks(true)   |
 | Toggle bookmarks                  | require'bookmarks'.toggle_bookmarks()    |
 | Delete bookmark at virt text line | require'bookmarks.list'.delete_on_virt() |
 | Show bookmark desc                | require'bookmarks.list'.show_desc()      |

@@ -8,10 +8,10 @@ local config = nil
 
 local focus_manager = (function()
     --- @alias WinType string
-    --- @alias WinId integer 
+    --- @alias WinId integer
     local current_type = nil --- @type WinType | nil
-    local win_types = {} --- @type WinType[]
-    local wins = {} --- @type table<WinType, WinId>
+    local win_types = {}     --- @type WinType[]
+    local wins = {}          --- @type table<WinType, WinId>
 
     local function toogle()
         local next_type = nil
@@ -192,11 +192,15 @@ function M.open_bookmarks()
     data.bufbb = float.create_border(options).buf
     api.nvim_buf_set_option(data.bufb, 'filetype', 'bookmarks')
 
-    vim.keymap.set( "n", config.keymap.jump, require("bookmarks").jump, { desc = "bookmarks jump", buffer = data.bufb, silent = true })
+    vim.keymap.set("n", config.keymap.jump, require("bookmarks").jump,
+        { desc = "bookmarks jump", buffer = data.bufb, silent = true })
     vim.keymap.set("n", "<2-LeftMouse>", require("bookmarks").jump, { buffer = data.bufb, silent = true })
-    vim.keymap.set("n", config.keymap.delete, require("bookmarks").delete, { desc = "bookmarks delete", buffer = data.bufb, silent = true })
-    vim.keymap.set("n", config.keymap.order, function() require("bookmarks.list").refresh(true) end, { desc = "bookmarks order", buffer = data.bufb, silent = true })
-    vim.keymap.set("n", config.keymap.close, function() require("bookmarks").close_bookmarks() end, { desc = "bookmarks close", buffer = data.bufb, silent = true })
+    vim.keymap.set("n", config.keymap.delete, require("bookmarks").delete,
+        { desc = "bookmarks delete", buffer = data.bufb, silent = true })
+    vim.keymap.set("n", config.keymap.order, function() require("bookmarks.list").refresh(true) end,
+        { desc = "bookmarks order", buffer = data.bufb, silent = true })
+    vim.keymap.set("n", config.keymap.close, function() require("bookmarks").close_bookmarks() end,
+        { desc = "bookmarks close", buffer = data.bufb, silent = true })
 
     api.nvim_win_set_option(data.bufbw, "cursorline", true)
     api.nvim_win_set_option(data.bufbw, "wrap", false)
@@ -311,8 +315,10 @@ function M.open_tags()
         end,
         { desc = "bookmarks focus", silent = true, noremap = true, buffer = data.buft }
     )
-    vim.keymap.set("n", config.keymap.toogle_focus, focus_manager.toogle, { desc = "bookmarks close", silent = true, noremap = true, buffer = data.buft })
-    vim.keymap.set("n", config.keymap.close, function() require("bookmarks").close_bookmarks() end, { desc = "bookmarks close", buffer = data.buft, silent = true })
+    vim.keymap.set("n", config.keymap.toogle_focus, focus_manager.toogle,
+        { desc = "bookmarks close", silent = true, noremap = true, buffer = data.buft })
+    vim.keymap.set("n", config.keymap.close, function() require("bookmarks").close_bookmarks() end,
+        { desc = "bookmarks close", buffer = data.buft, silent = true })
     M.write_tags()
 end
 
@@ -541,14 +547,14 @@ function M.close_preview_border()
     data.bufbp = nil
 end
 
-function M.open_add_win(line)
+function M.open_add_win(title)
     local ew = api.nvim_get_option("columns")
     local eh = api.nvim_get_option("lines")
     local width, height = 100, 1
     local options = {
         width = width,
         height = height,
-        title = "Input description",
+        title = title,
         row = math.floor((eh - height) / 2),
         col = math.floor((ew - width) / 2),
         relative = "editor",
