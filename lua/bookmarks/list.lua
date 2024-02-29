@@ -502,8 +502,11 @@ function M.show_desc()
 end
 
 -- Dofile
-function M.load(item)
+function M.load(item, is_persistent)
     data.bookmarks[item.id] = item
+    if is_persistent ~= nil and is_persistent == true then
+        return
+    end
 
     if data.bookmarks_groupby_filename[item.filename] == nil then
         data.bookmarks_groupby_filename[item.filename] = {}
