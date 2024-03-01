@@ -366,17 +366,17 @@ function M.persistent()
     local local_str = ""
     local global_str = ""
     local global_old_data = {}
-    for id, data in pairs(data.bookmarks) do
-        local sub = M.fill_tpl(data)
-        if data["is_global"] ~= nil and data["is_global"] == true then -- global bookmarks
-            if data["is_new"] == true then
+    for id, bookmark in pairs(data.bookmarks) do
+        local sub = M.fill_tpl(bookmark)
+        if bookmark["is_global"] ~= nil and bookmark["is_global"] == true then -- global bookmarks
+            if bookmark["is_new"] == true then
                 if global_str == "" then
                     global_str = string.format("%s%s", global_str, sub)
                 else
                     global_str = string.format("%s\n%s", global_str, sub)
                 end
             end
-            global_old_data[id] = data
+            global_old_data[id] = bookmark
         else
             if local_str == "" then
                 local_str = string.format("%s%s", local_str, sub)
@@ -390,22 +390,22 @@ function M.persistent()
         return
     end
 
-    -- local bookmarks
+    -- 1.local bookmarks
     local local_fd = assert(io.open(data.data_filename, "w"))
     local_fd:write(local_str)
     local_fd:close()
 
-    -- global bookmarks
+    -- 2.global bookmarks
     local global_file_name = config.storage_dir .. config.sep_path .. "bookmarks_global"
     if vim.loop.fs_stat(global_file_name) then
         data.bookmarks = {}
         dofile(global_file_name)
         -- combine
-        for id, value in pairs(data.bookmarks) do
+        for id, bookmark in pairs(data.bookmarks) do
             if global_old_data[id] ~= nil then
                 global_str = string.format("%s\n%s", global_str, M.fill_tpl(global_old_data[id]))
             elseif data.deleted_ids[id] == nil then
-                global_str = string.format("%s\n%s", global_str, M.fill_tpl(value)) -- new
+                global_str = string.format("%s\n%s", global_str, M.fill_tpl(bookmark)) -- new
             end
         end
     end
@@ -415,13 +415,13 @@ function M.persistent()
     global_fd:close()
 end
 
-function M.fill_tpl(data)
+function M.fill_tpl(bookmark)
     local tpl = [[
 require("bookmarks.list").load{
 	_
 }]]
     local sub = ""
-    for k, v in pairs(data) do
+    for k, v in pairs(bookmark) do
         if k ~= "is_new" then
             if sub ~= "" then
                 sub = string.format("%s\n%s", sub, string.rep(" ", 4))
