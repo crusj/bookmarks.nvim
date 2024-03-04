@@ -496,6 +496,9 @@ function M.preview_bookmark(filename, lineNumber)
         vim.schedule(function()
             local cuts = filename:split_b(".")
             local ext = cuts[#cuts]
+            if ext == "rs" then
+                ext = "rust"
+            end
             if #cuts > 1 and ext ~= "" and data.bufp ~= nil then
                 pcall(function()
                     local lang = vim.treesitter.language.get_lang(ext)
