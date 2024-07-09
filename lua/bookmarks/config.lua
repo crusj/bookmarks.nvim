@@ -35,6 +35,7 @@ function M.setup(user_config)
             cursorline = "guibg=Gray guifg=White", -- cursorline highlight
         },
         sep_path = "/",
+        datetime_formate = "",
     }
 
     if user_config ~= nil and type(user_config) == "table" then
