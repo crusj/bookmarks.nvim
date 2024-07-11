@@ -170,6 +170,10 @@ local function tags_autocmd(buffer)
 end
 
 function M.open_bookmarks()
+    if config == nil then
+        return
+    end
+
     data.buff = api.nvim_get_current_buf()
     data.bufw = api.nvim_get_current_win()
 
@@ -449,9 +453,17 @@ function M.preview_bookmark(filename, lineNumber)
     local _, _, _, _, _, _, _, _, w, h, pr, pc = calculate_window_size()
 
     local title = "Nothing to preview"
-    if filename ~= nil then
-        local common_len = helper.get_str_common_len(vim.fn.getcwd(), filename)
-        title = string.sub(filename, common_len + 1)
+    if filename ~= nil and config ~= nil then
+        local path_cuts = filename:split_b(config.sep_path)
+        if #path_cuts >= 1 then
+            title = path_cuts[#path_cuts]
+        else
+            title = "Bad filename"
+        end
+
+        --
+        -- local common_len = helper.get_str_common_len(vim.fn.getcwd(), filename)
+        -- title = string.sub(filename, common_len + 1)
     end
 
     local options = {

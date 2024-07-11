@@ -33,6 +33,10 @@ local border_chars = {}
 
 function M.setup()
     config = require("bookmarks.config").get_data()
+    if config == nil then
+        return
+    end
+
     border_chars = border_chars_types[config.border_style or "single"]
 end
 
