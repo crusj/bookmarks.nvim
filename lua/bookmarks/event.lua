@@ -20,6 +20,11 @@ end
 
 -- global keymaps.
 function M.key_bind()
+    -- check nil
+    if config == nil then
+        return
+    end
+
     -- add local bookmarks
     vim.keymap.set("n", config.keymap.add, function() require("bookmarks").add_bookmarks(false) end,
         { desc = "bookmarks add", silent = true })
