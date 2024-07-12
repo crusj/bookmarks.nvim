@@ -134,7 +134,16 @@ require("bookmarks").setup({
     hl = {
         border = "TelescopeBorder", -- border highlight
         cursorline = "guibg=Gray guifg=White", -- cursorline highlight
-    }
+    },
+    datetime_format = "%Y-%m-%d %H:%M:%S", -- os.date
+    -- •	%Y: Four-digit year
+    -- •	%m: Two-digit month (01 to 12)
+    -- •	%d: Two-digit day (01 to 31)
+    -- •	%H: Hour in 24-hour format (00 to 23)
+    -- •	%I: Hour in 12-hour format (01 to 12)
+    -- •	%M: Two-digit minute (00 to 59)
+    -- •	%S: Two-digit second (00 to 59)
+    -- •	%p: AM/PM indicator
 })
 ```
 

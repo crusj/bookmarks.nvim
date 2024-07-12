@@ -204,7 +204,7 @@ function M.flush()
 
         local tmp = item.fre
         if data.bookmarks_order == "time" then
-            tmp = os.date("%Y-%m-%d %H:%M:%S", item.updated_at)
+            tmp = os.date(config.datetime_format, item.updated_at)
             rep2 = math.floor(data.bw * 0.4)
         end
 
