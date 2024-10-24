@@ -1,65 +1,49 @@
-require("bookmarks.split")
-
-local c = require("bookmarks.config")
-local e = require("bookmarks.event")
-local l = require("bookmarks.list")
-local w = require("bookmarks.window")
-local data = require("bookmarks.data")
-local api = vim.api
-
--- Check module telescope is exists.
-if pcall(require, "telescope") then
-    require("telescope._extensions.bookmarks")
-end
+local list = require("list")
 
 local M = {}
 
-function M.setup(user_config)
-    c.setup(user_config)
-    l.setup()
-    e.setup()
-    w.setup()
+
+function M.key_bind()
+    vim.keymap.set("n", "mo", function() require("list").jump() end,
+        { desc = "bookmarks jump", silent = true })
+
+    -- add local bookmarks
+    vim.keymap.set("n", "mm", function() require("list").add_bookmark() end,
+        { desc = "bookmarks add", silent = true })
+
+    -- delete bookmarks
+    vim.keymap.set("n", "mD", function() require("list").delete() end,
+        { desc = "bookmarks delete", silent = true })
 end
 
--- Add bookmark.
-function M.add_bookmarks(is_global)
-    l.add_bookmark(vim.fn.line('.'), api.nvim_get_current_buf(), vim.fn.line("$"), is_global)
+--
+function M.autocmd()
+    api.nvim_create_autocmd({ "VimLeave" }, {
+        callback = list.persistent
+    })
+
+    api.nvim_create_autocmd({ "BufWritePost" }, {
+        callback = function()
+            local buf = api.nvim_get_current_buf()
+            list.set_marks(buf, list.get_buf_bookmark_lines(buf))
+        end
+    })
+
+    api.nvim_create_autocmd({ "BufWinEnter" }, {
+        callback = function()
+            local buf = api.nvim_get_current_buf()
+            list.set_marks(buf, list.get_buf_bookmark_lines(buf))
+        end
+    })
 end
 
--- Open bookmarks window.
-function M.open_bookmarks()
-    data.last_win = vim.api.nvim_get_current_win()
-    data.last_buf = vim.api.nvim_get_current_buf()
+function M.setup()
+    vim.cmd("hi link bookmarks_virt_text_hl Comment")
+    vim.fn.sign_define("BookmarkSign", { text = "󰃃" })
 
-    -- open bookmarks
-    l.load_data()
-    w.open_bookmarks()
-    l.flush()
-end
-
--- Close bookmarks window.
-function M.close_bookmarks()
-    w.close_bookmarks()
-    l.restore()
-end
-
--- Toggle bookmarks window.
-function M.toggle_bookmarks()
-    if data.bufbw ~= nil and vim.api.nvim_win_is_valid(data.bufbw) then
-        M.close_bookmarks()
-    else
-        M.open_bookmarks()
-    end
-end
-
--- Jump to the corresponding bookmark's location.
-function M.jump()
-    l.jump(vim.fn.line("."))
-end
-
--- Delete bookmarks.
-function M.delete()
-    l.delete(vim.fn.line('.'))
+    M.key_bind()
+    M.autocmd()
+    list.setup()
 end
 
 return M
