@@ -160,7 +160,7 @@ require("bookmarks").setup({
 
 | Desc                              | Func                                     |
 | --------------------------------- | ---------------------------------------- |
-| Add local bookmarks               | require'bookmarks'.add_bookmarks(fasle)  |
+| Add local bookmarks               | require'bookmarks'.add_bookmarks(false)  |
 | Add global bookmarks              | require'bookmarks'.add_bookmarks(true)   |
 | Toggle bookmarks                  | require'bookmarks'.toggle_bookmarks()    |
 | Delete bookmark at virt text line | require'bookmarks.list'.delete_on_virt() |
